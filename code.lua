@@ -1,0 +1,33 @@
+return {
+  ["CODE_WAIT_FOR_CALLBACK"] = -1,   -- 异步调用成功，请等待回调
+  ["CODE_OK"] = 0,    --操作成功
+  ["CODE_SYSTEM_BUSY"] = 1,    -- 系统忙，正在处理中
+  ["CODE_NOT_LOGIN"] = 2,    -- 还未登陆
+  ["CODE_CREATE_FILE_FAILED"] = 3,    -- 创建文件失败
+  ["CODE_TARGET_IS_SELF"] = 4,    -- 目标是自己(已废除)
+  ["CODE_RELOGIN_OK"] = 5,    -- 重登陆成功
+  ["CODE_OFFLINELOGIN_SUCCESS"] = 6,    -- 离线登陆模式成功
+  ["CODE_TIMEOUT"] = 300,  -- 超时
+  ["CODE_VERIFYFAILED"] = 400,  -- 验证失败
+  ["CODE_NO_PERMISSION"] = 401,  -- 没有权限
+  ["CODE_REPEATOPER"] = 402,  -- 重复操作
+  ["CODE_GROUP_NOT_FOUND"] = 403,  -- 群组未找到
+  ["CODE_USER_NOT_FOUND"] = 404,  -- 用户未找到
+  ["CODE_LOGIN_FAILED"] = 500,  -- 登录失败(此命名有误，应为操作失败)
+  ["CODE_FORCELOGOUT"] = 600,  -- 强制登出(被其他设备同一账号踢下线).
+  ["CODE_NETWORK_DISCONNECTED"] = 700,  -- 网络连接断开
+  ["CODE_ROOM_NOT_EXIST"] = 33,   -- 聊天室不存在
+  ["CODE_ROOM_IS_FULL"] = 34,   -- 聊天室人数已满
+  ["CODE_NOT_IN_ROOM"] = 35,   -- 不在聊天室内
+  ["CODE_FORBIDDEN"] = 36,   -- 操作禁止
+  ["CODE_ALREADY_IN_ROOM"] = 39,   -- 已经在聊天室中
+  ["CODE_USER_NOT_EXIST"] = 804,  -- 用户不存在
+  ["CODE_REQUEST_MIC_FAILED"] = 806,  -- 请求Mic失败
+  ["CODE_VOICE_TIME_OVER"] = 807,  -- 录音时间超出
+  ["CODE_RECORDER_BUSY"] = 808,  -- 录音设备正在使用
+  ["CODE_VOICE_TOO_SHORT"] = 809,  -- 录音时间过短  1000ms
+  ["CODE_INVALIDARGUMENT"] = 1000, -- 有不合法参数
+  ["CODE_SERVER_PROCRESS_ERROR"] = 1001, -- 服务器处理失败(可能含有非法参数)
+  ["CODE_DB_ERROR"] = 1002, -- 操作数据库失败.
+  ["CODE_UNKNOW_ERROR"] = 1100  -- 未知错误
+}
