@@ -80,8 +80,8 @@ end
 --用户登录
 --
 --
-function LOGIN(code, user)
-  delegate.login(code, user)
+function LOGIN(_, response)
+  delegate.login(response.code, cjson.encode(response.user))
 end
 
 

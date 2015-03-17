@@ -1,5 +1,9 @@
--- 处理方法中调用在java中注册的方法
-
+function onLogin(code, user)
+  print(code, user)
+end
+--处理方法中调用在java中注册的方法
+--
+--
 local delegate = {
 
   login = function(code, user)
