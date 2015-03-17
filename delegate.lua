@@ -1,7 +1,11 @@
 -- 处理方法中调用在java中注册的方法
 
 local delegate = {
-  
+
+  login = function(code, user)
+    onLogin(code, user)
+  end,
+
   welcome = function(value)
    onWelcome()
   end,

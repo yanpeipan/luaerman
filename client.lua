@@ -7,6 +7,7 @@ local msgpack = require"MessagePack"
 local cjson = require"cjson"
 
 local _g = {}
+local protocol = protocol:new()
 
 --init
 --
@@ -25,26 +26,11 @@ function init(context, appkey)
   _g.json = context.json or 'msgpack'
   _g.client = websocket.client:new(_g.ws)
 
-  for k,v in pairs(_g.ws) do
-    print(k, v)
-  end
-
   local code = codes['CODE_VERIFYFAILED']
 
-  local _,err,html = _g.client:connect(_g.url, _g.protocol);
+  local _,err = _g.client:connect(_g.url, _g.protocol);
 
-  if err ~= nil then
-    if err == 'host or service not provided, or not known' then
-      code = codes['CODE_NETWORK_DISCONNECTED']
-    else
-      code = codes['CODE_VERIFYFAILED']
-    end
-  else
-    code = codes['CODE_OK']
-    --_g.fd = _g.client.sock:getfd()
-  end
-
-  return code
+  return _
 end
 
 --指令集
@@ -53,8 +39,8 @@ end
 --local commands = commandList
 local commands_do = {
 
-  ["LOGIN"] = function(value, ...)
-    local msg = {1007, value['usr'], value['psw']}
+  ["LOGIN"] = function(usr, psw)
+    local msg = {1007, usr, psw}
     send(msg)
   end,
 
@@ -63,10 +49,9 @@ local commands_do = {
 --调用指令
 --
 --cName string 指令名
-function call(cName,cValue)
+function call(cName,...)
   if type(commands_do[cName]) == "function" then
-    cValue = assert(cjson.decode(cValue))
-    commands_do[cName](cValue, unpack(cValue))
+    commands_do[cName](unpack(arg))
   else
     error('Err: ' .. cName .. ' not found!')
   end
@@ -81,7 +66,11 @@ function send(message)
       for k,v in pairs(message) do
         print(k,v)
       end
-      message = assert(msgpack.pack(message))
+      if _g.json == 'cjson' then
+        message = assert(cjson.encode(message))
+      else
+        message = assert(msgpack.pack(message))
+      end
       _g.client:send(message)
       receive()
     end
@@ -95,18 +84,28 @@ function receive()
   if _g.client ~= nil and _g.client.state == 'OPEN' then
     local message = _g.client:receive()
     if message == '[1003]' then
+      message = cjson.decode(message)
     elseif message ~= nil then
-      message = assert(msgpack.unpack(message))
-      if type(message) == 'table' then
-        for k, v in pairs(message) do
-          print(k, v)
-        end
+      if _g.json == 'cjson' then
+        message = assert(cjson.decode(message))
+      else
+        message = assert(msgpack.unpack(message))
       end
     end
-    --p.parse(message)
+    onmessage(message)
+  end
+end
+
+--On Message
+--
+--
+function onmessage(message)
+  if type(message) == 'table' and #message > 0 then
+    local code = assert(message[1])
+    local callback = protocol.parse(code)
+    callback(unpack(message))
   end
 end
 
 init()
---call('LOGIN', cjson.encode({['usr']='1506334335', ['psw']='295079529'}))
-call('LOGIN', cjson.encode({['usr']='18600218174', ['psw']='19891015'}))
+call('LOGIN', '18600218174', '19891015')

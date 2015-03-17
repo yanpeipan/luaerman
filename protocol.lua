@@ -10,8 +10,8 @@ function VIDEOINFO(array)
     delegate.videoInfo(cjson.encode(array[3]))
     for k,v in pairs(array[3]) do
       test("protocol VIDEOINFO k: "..k.."   v: "..v)
---      player.callback(metadata,k,v)
-        player.callback(k,v)
+      --      player.callback(metadata,k,v)
+      player.callback(k,v)
     end
   end
   -- 旧协议
@@ -25,10 +25,10 @@ function VIDEOREALURL(array)
   test("VIDEOREALURL")
   local msgLen = table.getn(array)
   if(2 == msgLen) then
-     delegate.realUrlInfo(cjson.encode(array[2]))
-     test("===protocol.lua===realUrlInfo param======"..cjson.encode(array[2]))
+    delegate.realUrlInfo(cjson.encode(array[2]))
+    test("===protocol.lua===realUrlInfo param======"..cjson.encode(array[2]))
   else
-     delegate.realUrlInfo("")
+    delegate.realUrlInfo("")
   end
 end
 
@@ -46,7 +46,7 @@ local status_delegate = {
   ["CODE_PLAY_UNSTART"] = function()
     delegate.play_unstart(1)
   end,
-  
+
   ["CODE_PLAY_CLOSE"] = function()
     delegate.play_unstart(0)
   end,
@@ -71,46 +71,48 @@ function CHATSYNC(array)
   end
 end
 
+--默认
+--
+--
+function DEFAULT(...)
+end
 
---class
+--用户登录
+--
+--
+function LOGIN(code, user)
+  delegate.login(code, user)
+end
+
+
+-- Protocol
+--
+--
 local protocol = function()
+
   local self = {}
-  self.code = {
-    [1]   = HELLO,
-    [2]   = WELCOME,
-    [6]   = GOODBYE,
-    [201] = VIDEOPLAY,
-    [202] = VIDEOPAUSE,
-    [203] = VIDEOSEEK,
-    [204] = VIDEOSTOP,
-    [205] = VIDEOSCALE,
-    [206] = GETVIDEOINFO,
-    [207] = VIDEOINFO,
-    [208] = SETVOLUME,
-    [209] = VIDEODEFINITION,
-    [210] = VIDEOSOURCE,
-    [211] = VIDEOBARRAGE,
-    [212] = GETREALURL,
-    [213] = VIDEOREALURL,
-    [401] = CHATSTART,
-    [402] = CHATSYNC,
-    [403] = CHATSTOP,
+
+  self.codes = {
+    [0] = DEFAULT,
+    [1001] = LOGINROOM,
+    [1002] = LOGOUTROOM,
+    [1003] = BEATS,
+    [1004] = CHATMESSAGE,
+    [1005] = ROOMMEMBERS,
+    [1006] = PRIVATECHAT,
+    [1007] = LOGIN,
+    [1008] = LOGOUT,
   }
 
   --param:message,json raw
-  self.parse = function(message)
-    test("protocol parse message")
-    local array = cjson.decode(message)
-    --    if array ~= nil and type(array) == "table" and table.getn(array) >= 1 then
-    if table.getn(array) >= 1 then
-      --判断self.code
-      local c = array[1]
-      --print(self.code[c])
-      if(type(self.code[c]) == "function") then
-        self.code[c](array)
-      end
+  --
+  --
+  self.parse = function(code)
+    if code ~= nil and type(self.codes[code]) == "function" then
+      return self.codes[code]
+    else
+      return self.codes[0]
     end
-
   end
 
   return self
