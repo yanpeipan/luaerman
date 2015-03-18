@@ -19,18 +19,82 @@ function init(context, appkey)
   context = context or {}
   _g.appkey = appkey
   _g.ws = {}
+  _g.device = context.device or ''
   _g.url = context.url or  'ws://192.168.1.16:7272'
+  _g.url = _g.url .. '?device=' .. _g.device
   --_g.url = context.url or  'ws://ws.me2.tv:7272'
   _g.protocol = context.protocol or 'RiverrunBinary'
   _g.ws.timeout = context.timeout or nil
   _g.json = context.json or 'msgpack'
+  return true
+end
+
+--连接服务器
+--
+--
+function connectServer()
   _g.client = websocket.client:new(_g.ws)
+  local code, err = _g.client:connect(_g.url, _g.protocol);
+end
 
-  local code = codes['CODE_VERIFYFAILED']
+--用户登录
+--
+--
+function login(usr, psw)
+  send({1007, usr, psw})
+end
 
-  local _,err = _g.client:connect(_g.url, _g.protocol);
+--用户注销
+--
+--
+function logout()
+  send({1008})
+end
 
-  return _
+--加入群
+--
+--
+function joinGroup(...)
+  if #arg == 1 then
+    send({1001, arg[1]})
+  elseif #arg ==2 then
+    send({1001, {vid=arg[1], vtype=arg[2]}})
+  end
+end
+
+--离开群
+--
+--
+function leaveGroup(...)
+  if #arg == 1 then
+    send({1002, arg[1]})
+  elseif #arg ==2 then
+    send({1002, {vid=arg[1], vtype=arg[2]}})
+  end
+end
+
+--发送消息
+--
+--
+function sendText(receiver, type, text, ext, len)
+  if type(text) == 'string' then
+    cjson.decode(text)
+  end
+  if type(text) == 'table' then
+    send({1004, {receiver, type}, message})
+  end
+end
+
+--清除缓存
+--
+--
+function clearCache()
+end
+
+--设置是否每次登录后自动获取离线消息
+--
+--
+function beginRcvOfflineMessge()
 end
 
 --指令集
@@ -40,8 +104,31 @@ end
 local commands_do = {
 
   ["LOGIN"] = function(usr, psw)
-    local msg = {1007, usr, psw}
-    send(msg)
+    send({1007, usr, psw})
+  end,
+
+  ["LOGOUT"] = function()
+    send({1008})
+  end,
+
+  ["LOGINROOM"] = function(...)
+    if #arg == 1 then
+      send({1001, arg[1]})
+    elseif #arg ==2 then
+      send({1001, {vid=arg[1], vtype=arg[2]}})
+    end
+  end,
+
+  ["LOGOUTROOM"] = function(room)
+    send({1002, room})
+  end,
+
+  ["BEATS"] = function()
+    send({1003})
+  end,
+
+  ["CHATMESSAGE"] = function(room, message)
+    send({1004, room, message})
   end,
 
 }
@@ -103,9 +190,17 @@ function onmessage(message)
   if type(message) == 'table' and #message > 0 then
     local code = assert(message[1])
     local callback = protocol.parse(code)
-    callback(unpack(message))
+    table.remove(message, 1)
+    for k,v in pairs(message) do
+      print(k,v)
+    end
+    callback(_g, unpack(message))
   end
 end
 
-init()
-call('LOGIN', '18600218174', '19891015')
+init({device='android'})
+connectServer()
+login('18600218174', '19891015')
+--logout()
+--joinGroup(1)
+--leaveGroup(1)
