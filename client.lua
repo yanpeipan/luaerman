@@ -11,22 +11,21 @@ local protocol = protocol:new()
 
 --init
 --
---context table 为上下文环境
---appkey string API key
+--device 设备名称
+--protocol 默认协议：'RiverrunBinary'
+--timeout 默认不超时
+--json 默认使用msgpack
 --return void
-function init(context, appkey)
-
-  context = context or {}
+function init(device, protocol, timeout, json)
   _g.appkey = appkey
   _g.ws = {}
-  _g.device = context.device or ''
-  _g.url = context.url or  'ws://192.168.1.16:7272'
+  _g.device = device or ''
+  _g.url = url or 'ws://192.168.1.16:7272'
+  --_g.url = url or 'ws://ws.me2.tv:7272'
   _g.url = _g.url .. '?device=' .. _g.device
-  --_g.url = context.url or  'ws://ws.me2.tv:7272'
-  _g.protocol = context.protocol or 'RiverrunBinary'
-  _g.ws.timeout = context.timeout or nil
-  _g.json = context.json or 'msgpack'
-  return true
+  _g.protocol = protocol or 'RiverrunBinary'
+  _g.ws.timeout = timeout or nil
+  _g.json = json or 'msgpack'
 end
 
 --连接服务器
@@ -76,13 +75,15 @@ end
 --发送消息
 --
 --
-function sendText(receiver, type, text, ext, len)
+function sendText(receiver, type, text)
   if type(text) == 'string' then
-    cjson.decode(text)
+    text = assert(cjson.decode(text))
   end
   if type(text) == 'table' then
+    local message = {}
     send({1004, {receiver, type}, message})
   end
+  onSendMessage(0, message)
 end
 
 --清除缓存
@@ -95,53 +96,6 @@ end
 --
 --
 function beginRcvOfflineMessge()
-end
-
---指令集
---
---
---local commands = commandList
-local commands_do = {
-
-  ["LOGIN"] = function(usr, psw)
-    send({1007, usr, psw})
-  end,
-
-  ["LOGOUT"] = function()
-    send({1008})
-  end,
-
-  ["LOGINROOM"] = function(...)
-    if #arg == 1 then
-      send({1001, arg[1]})
-    elseif #arg ==2 then
-      send({1001, {vid=arg[1], vtype=arg[2]}})
-    end
-  end,
-
-  ["LOGOUTROOM"] = function(room)
-    send({1002, room})
-  end,
-
-  ["BEATS"] = function()
-    send({1003})
-  end,
-
-  ["CHATMESSAGE"] = function(room, message)
-    send({1004, room, message})
-  end,
-
-}
-
---调用指令
---
---cName string 指令名
-function call(cName,...)
-  if type(commands_do[cName]) == "function" then
-    commands_do[cName](unpack(arg))
-  else
-    error('Err: ' .. cName .. ' not found!')
-  end
 end
 
 --发送消息
@@ -197,6 +151,71 @@ function onmessage(message)
     callback(_g, unpack(message))
   end
 end
+
+--获取对应消息类型的所有未读个数
+--
+--
+function getUnreadMsgcountByType(type)
+  return 0
+end
+
+--未读消息数量
+--
+--
+function getUnreadMsgcount(target, type)
+  return 0
+end
+
+--将和某个聊天对象的全部消息标记为已读
+--
+--
+function markMessagesAsread(target, type, isread)
+end
+
+--获取对应Target的最后一条消息
+--
+--
+function getLastMessage(target, type)
+end
+
+--删除会话
+--
+--
+function deleteSession(target, type, removeMessage)
+end
+
+--获取回话列表
+--
+--
+function getSessionlist()
+end
+
+--获取用户详情
+--
+--
+function getTargetDetail(target, type, forceRequest)
+end
+
+--请求获取群成员列表
+--
+--
+function requestGroupMemberlist(groupId, pageIndex)
+end
+
+--是否在线
+--
+--
+function isOnline()
+end
+
+--激活对应的会话session（这样收到的对应该Target的消息自动标记为已读）
+--
+--
+function activeSession(target, type)
+end
+
+--
+
 
 init({device='android'})
 connectServer()

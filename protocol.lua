@@ -9,9 +9,14 @@ local protocol = function()
   local self = {}
 
   self.codes = {
-    [0] = function()end,
-    [1001] = function(room, user)
-      --delegate.onJoinGroup()
+    [0] = function()
+    end,
+    [1001] = function(_, room, user)
+      if user ~= nil and user.uid ~= _.user.uid then
+        delegate.onUserJoinGroup(code, group)
+      else
+        delegate.onJoinGroup()
+      end
     end,
     [1002] = function()
       delegate.onUserLeaveGroup()
@@ -19,10 +24,10 @@ local protocol = function()
     [1003] = function()
       delegate.onBeat()
     end,
-    [1004] = function()
+    [1004] = function(_)
       delegate.onReceiveMessage()
     end,
-    [1005] = function()
+    [1005] = function(_)
       delegate.onGetGroupMemberList()
     end,
     [1007] = function(_, response)
