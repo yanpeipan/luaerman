@@ -1,5 +1,7 @@
 local cjson  = require'cjson'
-local delegate = require "delegate"
+
+function delegate(event,code,...)
+end
 
 -- Protocol
 --
@@ -13,31 +15,34 @@ local protocol = function()
     end,
     [1001] = function(_, room, user)
       if user ~= nil and user.uid ~= _.user.uid then
-        delegate.onUserJoinGroup(code, group)
+        delegate('GotyeEventCodeUserJoinGroup', code, group, user)
       else
-        delegate.onJoinGroup()
+        delegate('GotyeEventCodeJoinGroup', code, group)
       end
     end,
     [1002] = function()
-      delegate.onUserLeaveGroup()
+      if user ~= nil and user.uid ~= _.user.uid then
+        delegate('GotyeEventCodeUserLeaveGroup', code, group, user)
+      else
+        delegate('GotyeEventCodeLeaveGroup', code, group)
+      end
     end,
-    [1003] = function()
-      delegate.onBeat()
+    [1003] = function(_)
     end,
-    [1004] = function(_)
-      delegate.onReceiveMessage()
+    [1004] = function(_, target, message)
+      delegate('GotyeEventCodeReceiveMessage', target, message)
     end,
-    [1005] = function(_)
-      delegate.onGetGroupMemberList()
+    [1005] = function(_, target, members)
+      delegate('GotyeEventCodeGetGroupUserList', target, members)
     end,
     [1007] = function(_, response)
-      if _ ~= nil and response.code == 0 then
+      if response.code == 0 then
         _.user = response.user
       end
-      delegate.onLogin(response.code, cjson.encode(response.user))
+      delegate('GotyeEventCodeLogin', response.code, cjson.encode(response.user))
     end,
     [1008] = function()
-      --delegate.onLogout()
+      delegate('GotyeEventCodeLogout')
     end,
   }
 

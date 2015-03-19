@@ -8,9 +8,6 @@ local cjson = require"cjson"
 
 local _g = {}
 local protocol = protocol:new()
-local commands = {
-  ['LOGIN'] = login
-}
 
 --init
 --
@@ -45,6 +42,7 @@ end
 --
 function login(usr, psw)
   send({1007, usr, psw})
+  return true
 end
 
 --用户注销
@@ -226,11 +224,9 @@ end
 function activeSession(target, type)
 end
 
---
-
-
 init('android')
-connectServer()
+local ltn12 = require("ltn12")
+--connectServer()
 --call('login', '18600218174', '19891015')
 --login('18600218174', '19891015')
 --logout()
