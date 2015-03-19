@@ -34,6 +34,7 @@ end
 function connectServer()
   _g.client = websocket.client:new(_g.ws)
   local code, err = _g.client:connect(_g.url, _g.protocol);
+  return code
 end
 
 --用户登录
@@ -217,7 +218,7 @@ end
 --
 
 
-init({device='android'})
+init('android')
 connectServer()
 login('18600218174', '19891015')
 --logout()

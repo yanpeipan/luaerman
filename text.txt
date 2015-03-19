@@ -1,0 +1,92 @@
+同步方法（需要返回值）
+
+
+int getUnreadMsgcountByType(  int targetType)
+  参数： targetType：0：单聊； 1：聊天室；  2：群聊
+  返回值： 未读消息数
+
+String getLastMessage(String 用户名/聊天室ID/群ID，int targetType)
+  targetType：同上
+  返回值：String json? Message json
+
+
+
+  ====
+  String getTargetDetail(String 用户名) 方法名也可以改requestUserInfo
+  返回值：String json? User json
+  ====
+
+
+  涉及本地：
+  Sting getSessionList() 会话列表
+  返回： json？
+
+int  isOnline()
+  返回值： -1 offline； 0： not  login/logout; 1:online
+
+  涉及本地：
+getLocalMessage(String 用户名/聊天室ID/群ID，int targetType)
+  targetType：同上
+
+
+  只回调
+logout()—异步回调onLogout(code)
+
+  requestGroupMemberlist(long groupID,int 分页)— 异步回调：  onGetGroupMemberList(int code, List<User> allList,
+      List<User> curList, GotyeGroup group, int pagerIndex);
+回调方法中参数参考GotyeAPI 参数形式需要讨论
+
+leaveGroup(int GroupID)— 异步回调：onLeaveGroup(int code, GotyeGroup gp)
+  回调方法中参数: code:状态码一览表， group 上层只用到groupID 和name
+
+sendText(String 用户名/聊天室ID/群ID,int targetType,信息内容, extraData,len)
+  当前extraData都是null； len都是0—回调方法： onSendMessage (int code, GotyeMessage message);
+
+
+
+  返回值、回调都需要：
+
+login (String username,String password)
+  --调用参数： 用户名； 密码
+  --返回值： int   接口返回值（状态码）一览表 LOGIN部分
+--onLogin(0, int code, User user)
+  code : 5中状态码之一
+
+joinGroup(int GroupID)— 异步回调：onJoinGroup(int code, GotyeGroup gp)
+  回调方法中参数: code:状态码一览表， group 上层只用到groupID 和name,代表group的json
+
+
+
+
+  同步异步都可以（不需要返回值 不需要回调）
+  markMeeagesAsread(String 用户名/聊天室ID/群ID，int targetType)
+保留接口(可能不需要)
+  targetType：0：单聊； 1：聊天室； 2：群聊
+
+
+
+
+  本地方法？
+
+deleteSession(String 用户名/聊天室ID/群ID，int targetType)
+  targetType：同上
+String getLoginUser()
+
+  获取用户头像
+
+  有时候我们会希望在界面上展示好友（群/聊天室）头像，这个时候可以调用如下接口去下载其头像到本地 :
+
+  涉及本地=====
+  gotyeApi.downloadMedia(url);/// <对应回调DownloadListener中的:onDownloadMedia，url为对应user中的Icon中的url
+  回调原型：
+
+  onDownloadMedia(int code,String path,String url); /// path为对应下载的文件路径，url为对应url
+
+
+  只有回调
+  收到消息：
+  onReceiveMessage(int code, GotyeMessage message);
+
+
+
+
