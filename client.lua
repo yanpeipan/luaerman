@@ -8,6 +8,9 @@ local cjson = require"cjson"
 
 local _g = {}
 local protocol = protocol:new()
+local commands = {
+  ['LOGIN'] = login
+}
 
 --init
 --
@@ -119,6 +122,14 @@ function send(message)
   end
 end
 
+function call(cName,...)
+  if type(_G[cName]) == "function" then
+    _G[cName](unpack(arg))
+  else
+    error('Err: ' .. cName .. ' not found!')
+  end
+end
+
 --接受消息
 --
 --
@@ -220,7 +231,8 @@ end
 
 init('android')
 connectServer()
-login('18600218174', '19891015')
+--call('login', '18600218174', '19891015')
+--login('18600218174', '19891015')
 --logout()
 --joinGroup(1)
 --leaveGroup(1)
