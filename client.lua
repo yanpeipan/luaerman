@@ -5,6 +5,8 @@ local protocol = require"protocol"
 local codes = require"code"
 local msgpack = require"MessagePack"
 local cjson = require"cjson"
+local md5 = require"md5"
+local httpclient = require"httpclient".new()
 
 local _g = {}
 local protocol = protocol:new()
@@ -21,11 +23,13 @@ function init(device, protocol, timeout, json)
   _g.ws = {}
   _g.device = device or ''
   _g.url = url or 'ws://192.168.1.16:7272'
+  _g.api = url or 'http://192.168.1.16:55252'
   --_g.url = url or 'ws://ws.me2.tv:7272'
   _g.url = _g.url .. '?device=' .. _g.device
   _g.protocol = protocol or 'RiverrunBinary'
   _g.ws.timeout = timeout or nil
   _g.json = json or 'msgpack'
+  _g.key = key or 'woRKeRmAn'
 end
 
 --连接服务器
@@ -35,6 +39,15 @@ function connectServer()
   _g.client = websocket.client:new(_g.ws)
   local code, err = _g.client:connect(_g.url, _g.protocol);
   return code
+end
+
+--获取API请求URI
+--
+--
+function getApiUrl(path)
+  local time = os.time()
+  local token = md5.sumhexa(md5.sumhexa(_g.key) .. time)
+  return _g.api .. path .. '?time=' .. time .. '&token=' .. token
 end
 
 --用户登录
@@ -106,9 +119,6 @@ end
 function send(message)
   if _g.client ~= nil and _g.client.state == 'OPEN' then
     if type(message) == 'table' then
-      for k,v in pairs(message) do
-        print(k,v)
-      end
       if _g.json == 'cjson' then
         message = assert(cjson.encode(message))
       else
@@ -120,6 +130,9 @@ function send(message)
   end
 end
 
+--调用声明函数
+--
+--
 function call(cName,...)
   if type(_G[cName]) == "function" then
     _G[cName](unpack(arg))
@@ -155,21 +168,35 @@ function onmessage(message)
     local code = assert(message[1])
     local callback = protocol.parse(code)
     table.remove(message, 1)
-    for k,v in pairs(message) do
-      print(k,v)
-    end
     callback(_g, unpack(message))
   end
 end
 
---获取对应消息类型的所有未读个数
---
---
-function getUnreadMsgcountByType(type)
-  return 0
+function getUser(key)
+  local value = nil
+  if _g ~= nil and _g.user ~= nil then
+    value = _g.user[key]
+  end
+  return value
 end
 
---未读消息数量
+--获取对应消息类型的所有未读个数
+--targetType ：0：单聊； 1：聊天室； 2：群聊
+--
+function getUnreadMsgcountByType(targetType)
+  local count = 0
+  local uid = getUser('uid')
+  local url = getApiUrl('/list/' .. uid)
+  if uid then
+    local result = httpclient:get(url)
+    if result ~= nil then
+      count = result.total or 0
+    end
+  end
+  return count
+end
+
+--获取和某个聊天对象target（GotyeChatTarget）的未读消息数
 --
 --
 function getUnreadMsgcount(target, type)
@@ -179,7 +206,7 @@ end
 --将和某个聊天对象的全部消息标记为已读
 --
 --
-function markMessagesAsread(target, type, isread)
+function markMessagesAsread(target, targetType)
 end
 
 --获取对应Target的最后一条消息
@@ -216,6 +243,7 @@ end
 --
 --
 function isOnline()
+  return _g.client ~= nil and _g.client.state == 'OPEN'
 end
 
 --激活对应的会话session（这样收到的对应该Target的消息自动标记为已读）
@@ -225,10 +253,11 @@ function activeSession(target, type)
 end
 
 init('android')
-local ltn12 = require("ltn12")
---connectServer()
---call('login', '18600218174', '19891015')
---login('18600218174', '19891015')
+connectServer()
+
+login('18600218174', '19891015')
+print(getUnreadMsgcountByType(0))
 --logout()
+
 --joinGroup(1)
 --leaveGroup(1)
