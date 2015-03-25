@@ -34,10 +34,13 @@ local protocol = function()
   self.codes = {
     [0] = function()
     end,
+    --join group
+    --user = {'icon', 'name', 'nickname', 'uid'} or {}
     [1001] = function(_, group, user)
       if user ~= nil then
         if user.uid == nil or user.uid ~= _.user.uid then
-          delegate('GotyeEventCodeJoinGroup', codes["CODE_OK"], group)
+          local data = cjson.encode({["code"]=codes["CODE_OK"], ["group"]=group})
+          delegate('GotyeEventCodeJoinGroup', data)
         else
           delegate('GotyeEventCodeUserJoinGroup', group, user)
         end
@@ -53,6 +56,8 @@ local protocol = function()
       end
     end,
     [1003] = function(_)
+      local message = msgpack.pack({1003})
+      _.client:send(message)
     end,
     [1004] = function(_, target, message)
       delegate('GotyeEventCodeReceiveMessage', target, message)
@@ -64,7 +69,7 @@ local protocol = function()
       if code == 0 then
         _.user = user
       end
-      delegate('GotyeEventCodeLogin', code, cjson.encode(user))
+      delegate('GotyeEventCodeLogin', cjson.encode({['code']=code, ['user']=user}))
     end,
     [1008] = function(_, code)
       if code == 0 then

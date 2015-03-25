@@ -186,8 +186,8 @@ end
 function getUnreadMsgcountByType(targetType)
   local count = 0
   local uid = getUser('uid')
-  local url = getApiUrl('/list/' .. uid)
-  if uid then
+  if uid ~= nil then
+    local url = getApiUrl('/list/' .. uid)
     local result = httpclient:get(url)
     if result ~= nil then
       count = result.total or 0
@@ -199,7 +199,7 @@ end
 --获取和某个聊天对象target（GotyeChatTarget）的未读消息数
 --
 --
-function getUnreadMsgcount(target, type)
+function getUnreadMsgcount(target, targetType)
   return 0
 end
 
