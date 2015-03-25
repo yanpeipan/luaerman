@@ -14,4 +14,6 @@ luarocks install socket
 luarocks install lua-websockets
 luarocks install lua-messagepack
 luarocks install httpclient
+luarocks install luasec
+luarocks install inspect
 ```
