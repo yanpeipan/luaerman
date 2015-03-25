@@ -1,5 +1,6 @@
 local cjson  = require'cjson'
 local codes = require'code'
+local eventCodes = require'eventCodes'
 
 function delegate(event,code,...)
   print(event, code)
@@ -40,18 +41,18 @@ local protocol = function()
       if user ~= nil then
         if user.uid == nil or user.uid ~= _.user.uid then
           local data = cjson.encode({["code"]=codes["CODE_OK"], ["group"]=group})
-          delegate('GotyeEventCodeJoinGroup', data)
+          delegate(eventCodes['GotyeEventCodeJoinGroup'], data)
         else
-          delegate('GotyeEventCodeUserJoinGroup', group, user)
+          delegate(eventCodes['GotyeEventCodeUserJoinGroup'], group, user)
         end
       end
     end,
     [1002] = function(_, group, user)
       if user ~= nil then
         if user.uid == nil or user.uid ~= _.user.uid then
-          delegate('GotyeEventCodeLeaveGroup', codes["CODE_OK"], group)
+          delegate(eventCodes['GotyeEventCodeLeaveGroup'], codes["CODE_OK"], group)
         else
-          delegate('GotyeEventCodeUserLeaveGroup', group, user)
+          delegate(eventCodes['GotyeEventCodeUserLeaveGroup'], group, user)
         end
       end
     end,
@@ -60,22 +61,22 @@ local protocol = function()
       _.client:send(message)
     end,
     [1004] = function(_, target, message)
-      delegate('GotyeEventCodeReceiveMessage', target, message)
+      delegate(eventCodes['GotyeEventCodeReceiveMessage'], target, message)
     end,
     [1005] = function(_, target, members)
-      delegate('GotyeEventCodeGetGroupUserList', target, members)
+      delegate(eventCodes['GotyeEventCodeGetGroupUserList'], target, members)
     end,
     [1007] = function(_, code, user)
       if code == 0 then
         _.user = user
       end
-      delegate('GotyeEventCodeLogin', cjson.encode({['code']=code, ['user']=user}))
+      delegate(eventCodes['GotyeEventCodeLogin'], cjson.encode({['code']=code, ['user']=user}))
     end,
     [1008] = function(_, code)
       if code == 0 then
         _.user = nil
       end
-      delegate('GotyeEventCodeLogout', code)
+      delegate(eventCodes['GotyeEventCodeLogout'], code)
     end,
   }
 
