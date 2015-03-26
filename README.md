@@ -16,4 +16,5 @@ luarocks install lua-messagepack
 luarocks install httpclient
 luarocks install luasec
 luarocks install inspect
+luarocks install lsqlite3 SQLITE_DIR=/usr/local/opt/sqlite/
 ```
