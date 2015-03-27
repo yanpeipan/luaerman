@@ -111,7 +111,7 @@ function sendText(receiver, receiverType, text)
   end
   if type(text) == 'table' then
     local message = {}
-    send({1004, {receiver, receiverType}, message})
+    send({1004, {['receiver']=receiver, ['receiver_type']=receiverType}, message})
   end
   --onSendMessage(0, message)
 end
