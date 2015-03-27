@@ -9,6 +9,7 @@ brew install lua
 brew install luarocks
 brew install sqlite3
 
+luarocks install lua-cjson
 luarocks install coxpcall
 luarocks install copas
 luarocks install socket
