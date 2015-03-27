@@ -1,6 +1,7 @@
 local cjson  = require'cjson'
 local codes = require'code'
 local msgpack = require'MessagePack'
+local eventCodes = require'eventCodes'
 
 function onDelegate(event, table)
   local data = table or {}
@@ -10,22 +11,6 @@ function onDelegate(event, table)
     data = cjson.encode({})
   end
   print(data)
-end
-
-function sprint(value)
-  local string = ''
-  if type(value) == 'table' then
-    string = '{\n'
-    for k, v in pairs(value) do
-      string = string .. k .. ':' .. sprint(v) .. '\n'
-    end
-    string = string .. '\n}'
-  elseif type(value) == 'boolean' then
-    if true == value then string ='true' else string = 'false' end
-  else
-    string = value
-  end
-  return string
 end
 
 -- Protocol
@@ -43,18 +28,18 @@ local protocol = function()
     [1001] = function(_, group, user)
       if user ~= nil then
         if user.uid == nil or user.uid ~= _.user.uid then
-          onDelegate('GotyeEventCodeJoinGroup', {["code"]=codes["CODE_OK"], ["group"]=group})
+          onDelegate(eventCodes['GotyeEventCodeJoinGroup'], {["code"]=codes["CODE_OK"], ["group"]=group})
         else
-          onDelegate('GotyeEventCodeUserJoinGroup', {['group']=group, ['user']=user})
+          onDelegate(eventCodes['GotyeEventCodeUserJoinGroup'], {['group']=group, ['user']=user})
         end
       end
     end,
     [1002] = function(_, group, user)
       if user ~= nil then
         if user.uid == nil or user.uid ~= _.user.uid then
-          onDelegate('GotyeEventCodeLeaveGroup', {['code']=codes["CODE_OK"], ['group']=group})
+          onDelegate(eventCodes['GotyeEventCodeLeaveGroup'], {['code']=codes["CODE_OK"], ['group']=group})
         else
-          onDelegate('GotyeEventCodeUserLeaveGroup', {['group']=group, ['user']=user})
+          onDelegate(eventCodes['GotyeEventCodeUserLeaveGroup'], {['group']=group, ['user']=user})
         end
       end
     end,
@@ -63,22 +48,22 @@ local protocol = function()
       _.client:send(message)
     end,
     [1004] = function(_, target, message)
-      onDelegate('GotyeEventCodeReceiveMessage', {['target']=target, ['message']=message})
+      onDelegate(eventCodes['GotyeEventCodeReceiveMessage'], {['target']=target, ['message']=message})
     end,
     [1005] = function(_, target, members)
-      onDelegate('GotyeEventCodeGetGroupUserList', {['target']=target, ['members']=members})
+      onDelegate(eventCodes['GotyeEventCodeGetGroupUserList'], {['target']=target, ['members']=members})
     end,
     [1007] = function(_, code, user)
       if code == 0 then
         _.user = user
       end
-      onDelegate('GotyeEventCodeLogin', {['code']=code, ['user']=user})
+      onDelegate(eventCodes['GotyeEventCodeLogin'], {['code']=code, ['user']=user})
     end,
     [1008] = function(_, code)
       if code == 0 then
         _.user = nil
       end
-      onDelegate('GotyeEventCodeLogout', {['code']=code})
+      onDelegate(eventCodes['GotyeEventCodeLogout'], {['code']=code})
     end,
   }
 
