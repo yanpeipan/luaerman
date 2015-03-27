@@ -2,6 +2,7 @@ local socket = require"socket"
 local websocket = require"websocket"
 local frame = require"websocket.frame"
 local protocol = require"protocol"
+local sqlite = require"lsqlite3"
 local codes = require"code"
 local msgpack = require"MessagePack"
 local cjson = require"cjson"
@@ -10,6 +11,19 @@ local httpclient = require"httpclient".new()
 
 local _g = {}
 local protocol = protocol:new()
+
+--getter
+--
+--在作用域外获取_g的值
+function getter(key)
+  local value = nil
+  if key == nil then
+    value = _g
+  else
+    value = rawget(_g, key)
+  end
+  return value
+end
 
 --init
 --
@@ -251,13 +265,3 @@ end
 --
 function activeSession(target, type)
 end
-
-init('android')
-connectServer()
-
-login('18600218174', '19891015')
-print(getUnreadMsgcountByType(0))
---logout()
-
---joinGroup(1)
---leaveGroup(1)

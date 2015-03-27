@@ -1,11 +1,15 @@
 local cjson  = require'cjson'
 local codes = require'code'
+local msgpack = require'MessagePack'
 
-function delegate(event,code,...)
-  print(event, code)
-  if #arg > 0 then
-    print(sprint(arg))
+function onDelegate(event, table)
+  local data = table or {}
+  if type(data) == 'table' then
+    data = cjson.encode(data)
+  else
+    data = cjson.encode({})
   end
+  print(data)
 end
 
 function sprint(value)
@@ -39,19 +43,18 @@ local protocol = function()
     [1001] = function(_, group, user)
       if user ~= nil then
         if user.uid == nil or user.uid ~= _.user.uid then
-          local data = cjson.encode({["code"]=codes["CODE_OK"], ["group"]=group})
-          delegate('GotyeEventCodeJoinGroup', data)
+          onDelegate('GotyeEventCodeJoinGroup', {["code"]=codes["CODE_OK"], ["group"]=group})
         else
-          delegate('GotyeEventCodeUserJoinGroup', group, user)
+          onDelegate('GotyeEventCodeUserJoinGroup', {['group']=group, ['user']=user})
         end
       end
     end,
     [1002] = function(_, group, user)
       if user ~= nil then
         if user.uid == nil or user.uid ~= _.user.uid then
-          delegate('GotyeEventCodeLeaveGroup', codes["CODE_OK"], group)
+          onDelegate('GotyeEventCodeLeaveGroup', {['code']=codes["CODE_OK"], ['group']=group})
         else
-          delegate('GotyeEventCodeUserLeaveGroup', group, user)
+          onDelegate('GotyeEventCodeUserLeaveGroup', {['group']=group, ['user']=user})
         end
       end
     end,
@@ -60,22 +63,22 @@ local protocol = function()
       _.client:send(message)
     end,
     [1004] = function(_, target, message)
-      delegate('GotyeEventCodeReceiveMessage', target, message)
+      onDelegate('GotyeEventCodeReceiveMessage', {['target']=target, ['message']=message})
     end,
     [1005] = function(_, target, members)
-      delegate('GotyeEventCodeGetGroupUserList', target, members)
+      onDelegate('GotyeEventCodeGetGroupUserList', {['target']=target, ['members']=members})
     end,
     [1007] = function(_, code, user)
       if code == 0 then
         _.user = user
       end
-      delegate('GotyeEventCodeLogin', cjson.encode({['code']=code, ['user']=user}))
+      onDelegate('GotyeEventCodeLogin', {['code']=code, ['user']=user})
     end,
     [1008] = function(_, code)
       if code == 0 then
         _.user = nil
       end
-      delegate('GotyeEventCodeLogout', code)
+      onDelegate('GotyeEventCodeLogout', {['code']=code})
     end,
   }
 
