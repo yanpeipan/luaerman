@@ -35,6 +35,7 @@ end
 function init(device, protocol, timeout, json)
   _g.appkey = appkey
   _g.ws = {}
+  _g.sqlite = {}
   _g.device = device or ''
   _g.url = url or 'ws://192.168.1.16:7272'
   _g.api = url or 'http://192.168.1.16:55252'
@@ -139,7 +140,6 @@ function send(message)
         message = assert(msgpack.pack(message))
       end
       _g.client:send(message)
-      receive()
     end
   end
 end

@@ -10,7 +10,7 @@ function onDelegate(event, table)
   else
     data = cjson.encode({})
   end
-  print(data)
+  print(event, data)
 end
 
 -- Protocol
