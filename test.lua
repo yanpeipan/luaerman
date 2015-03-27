@@ -8,7 +8,7 @@ call('receive')
 call('joinGroup', 1)
 call('receive')
 
-call('sendText', 1, 3, 'hello')
+call('sendText', 1, 3, {'hello'})
 call('receive')
 --call('leaveGroup', 1)
 --

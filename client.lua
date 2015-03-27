@@ -35,7 +35,7 @@ end
 function init(device, protocol, timeout, json)
   _g.appkey = appkey
   _g.ws = {}
-  _g.sqlite = {}
+  _g.sqlite = {path='/tmp/IMDB'}
   _g.device = device or ''
   _g.url = url or 'ws://192.168.1.16:7272'
   _g.api = url or 'http://192.168.1.16:55252'
@@ -105,15 +105,15 @@ end
 --发送消息
 --
 --
-function sendText(receiver, type, text)
+function sendText(receiver, receiverType, text)
   if type(text) == 'string' then
     text = assert(cjson.decode(text))
   end
   if type(text) == 'table' then
     local message = {}
-    send({1004, {receiver, type}, message})
+    send({1004, {receiver, receiverType}, message})
   end
-  onSendMessage(0, message)
+  --onSendMessage(0, message)
 end
 
 --清除缓存
