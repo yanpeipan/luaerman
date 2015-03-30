@@ -35,8 +35,8 @@ call('receive')
 
 call('joinGroup', 1)
 call('receive')
-call('requestGroupMemberlist', 1)
-call('receive')
+--call('requestGroupMemberlist', 1)
+--call('receive')
 
 --call('sendText', 1, 3, {'hello'})
 --call('leaveGroup', 1)

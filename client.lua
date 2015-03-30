@@ -36,14 +36,14 @@ end
 --timeout 默认不超时
 --json 默认使用msgpack
 --return void
-function init(device, protocol)
+function init(device, wsProtocol)
   _g.appkey = appkey
   _g.ws = {}
   _g.api = {}
   _g.sqlite = {path='/tmp/IMDB'}
   _g.device = device or ''
   _g.json = 'msgpack'
-  _g.protocol = protocol or 'riverrun.binary.msgpack'
+  _g.ws.protocol = wsProtocol or 'riverrun.binary.msgpack'
   --WS参数
   _g.ws.host = 'ws.me2.tv'
   _g.ws.host = '192.168.1.16'
@@ -55,6 +55,8 @@ function init(device, protocol)
   _g.api.port = '55252'
   _g.api.scheme = 'http'
   _g.api.key = key or 'woRKeRmAn'
+  --设置csjon
+  cjson.encode_sparse_array(true)
 end
 
 --连接服务器
@@ -63,7 +65,7 @@ end
 function connectServer()
   local options = {timeout=_g.ws.timeout}
   _g.client = websocket.client:new(options)
-  local wsProtocol = _g.protocol
+  local wsProtocol = _g.ws.protocol
   local wsUrl = getWSUrl()
   local code, err = _g.client:connect(wsUrl, wsProtocol);
   return code
@@ -77,6 +79,7 @@ function getWSUrl()
     host = _g.ws.host,
     port = _g.ws.port,
     scheme = _g.ws.scheme,
+    query = 'device=' .. _g.device
   })
   return wsUrl
 end
