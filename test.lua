@@ -33,8 +33,10 @@ call('login', '18600218174', '19891015')
 call('receive')
 --print(getter('user'))
 
---call('joinGroup', 1)
---call('receive')
+call('joinGroup', 1)
+call('receive')
+call('requestGroupMemberlist', 1)
+call('receive')
 
 --call('sendText', 1, 3, {'hello'})
 --call('leaveGroup', 1)
@@ -44,4 +46,6 @@ call('receive')
 
 --
 --
-print(call('getUnreadMsgcount', 1, 0))
+--print(getUnreadMsgcount(1, 0))
+--print(getTargetDetail(233555))
+--print(markMessagesAsread(233555))

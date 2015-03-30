@@ -10,7 +10,10 @@ local md5 = require"md5"
 local httpclient = require"httpclient".new()
 local url = require"socket.url"
 
-local _g = {}
+--client全局变量
+local _g = {
+  user={},
+}
 local protocol = protocol:new()
 
 --getter
@@ -152,6 +155,13 @@ function sendText(receiver, receiverType, text)
   --onSendMessage(0, message)
 end
 
+--请求获取群成员列表
+--
+--
+function requestGroupMemberlist(groupId, pageIndex)
+  send({1005, groupId, pageIndex})
+end
+
 --清除缓存
 --
 --
@@ -256,9 +266,6 @@ function getUnreadMsgcount(target, targetType)
     local params = {['sender'] = target, ['receiver_type']=targetType}
     local url = getApiUrl('/list/' .. uid, params)
     local result = httpclient:get(url)
-    for k, v in pairs(result) do
-      print(k, v)
-    end
     if result ~= nil then
       count = result.total or 0
     end
@@ -270,6 +277,17 @@ end
 --
 --
 function markMessagesAsread(target, targetType)
+  local uid = getUser('uid')
+  local resultTable = {}
+  if uid ~= nil then
+    local apiUrl = getApiUrl('/message/' .. target)
+    local data = ''
+    local result = httpclient:put(apiUrl, data)
+    if result ~= nil and result.code == 200 then
+      resultTable = cjson.decode(result.body) or {}
+    end
+  end
+  return resultTable.status or 0
 end
 
 --获取对应Target的最后一条消息
@@ -294,12 +312,16 @@ end
 --
 --
 function getTargetDetail(target, type, forceRequest)
-end
-
---请求获取群成员列表
---
---
-function requestGroupMemberlist(groupId, pageIndex)
+  local uid = getUser('uid')
+  local user = ''
+  if uid ~= nil then
+    local url = getApiUrl('/user/detail/' .. target)
+    local result = httpclient:get(url)
+    if result ~= nil and result.code == 200 then
+      user = result.body
+    end
+  end
+  return user
 end
 
 --是否在线

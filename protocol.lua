@@ -6,6 +6,7 @@ local eventCodes = require'eventCodes'
 function onDelegate(event, table)
   local data = table or {}
   if type(data) == 'table' then
+    cjson.encode_sparse_array(true)
     data = cjson.encode(data)
   else
     data = cjson.encode({})
