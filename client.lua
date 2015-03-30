@@ -8,6 +8,7 @@ local msgpack = require"MessagePack"
 local cjson = require"cjson"
 local md5 = require"md5"
 local httpclient = require"httpclient".new()
+local url = require"socket.url"
 
 local _g = {}
 local protocol = protocol:new()
@@ -32,37 +33,72 @@ end
 --timeout 默认不超时
 --json 默认使用msgpack
 --return void
-function init(device, protocol, timeout, json)
+function init(device, protocol)
   _g.appkey = appkey
   _g.ws = {}
+  _g.api = {}
   _g.sqlite = {path='/tmp/IMDB'}
   _g.device = device or ''
-  _g.url = url or 'ws://192.168.1.16:7272'
-  _g.api = url or 'http://192.168.1.16:55252'
-  --_g.url = url or 'ws://ws.me2.tv:7272'
-  _g.url = _g.url .. '?device=' .. _g.device
-  _g.protocol = protocol or 'RiverrunBinary'
-  _g.ws.timeout = timeout or nil
-  _g.json = json or 'msgpack'
-  _g.key = key or 'woRKeRmAn'
+  _g.json = 'msgpack'
+  _g.protocol = protocol or 'riverrun.binary.msgpack'
+  --WS参数
+  _g.ws.host = 'ws.me2.tv'
+  _g.ws.host = '192.168.1.16'
+  _g.ws.port = '7272'
+  _g.ws.scheme = 'ws'
+  _g.ws.timeout = nil
+  --API参数
+  _g.api.host = '192.168.1.16'
+  _g.api.port = '55252'
+  _g.api.scheme = 'http'
+  _g.api.key = key or 'woRKeRmAn'
 end
 
 --连接服务器
 --
 --
 function connectServer()
-  _g.client = websocket.client:new(_g.ws)
-  local code, err = _g.client:connect(_g.url, _g.protocol);
+  local options = {timeout=_g.ws.timeout}
+  _g.client = websocket.client:new(options)
+  local wsProtocol = _g.protocol
+  local wsUrl = getWSUrl()
+  local code, err = _g.client:connect(wsUrl, wsProtocol);
   return code
+end
+
+--获取WS服务URI
+--
+--
+function getWSUrl()
+  local wsUrl = url.build({
+    host = _g.ws.host,
+    port = _g.ws.port,
+    scheme = _g.ws.scheme,
+  })
+  return wsUrl
 end
 
 --获取API请求URI
 --
 --
-function getApiUrl(path)
-  local time = os.time()
-  local token = md5.sumhexa(md5.sumhexa(_g.key) .. time)
-  return _g.api .. path .. '?time=' .. time .. '&token=' .. token
+function getApiUrl(path, params)
+  params = params or {}
+  params.time = params.time or os.time()
+  params.token = md5.sumhexa(md5.sumhexa(_g.api.key) .. params.time)
+  --local apiUrl = _g.api .. path .. '?'
+  local query = ''
+  for k,v in pairs(params) do
+    query = query .. k .. '=' .. v .. '&'
+  end
+  --return _g.api .. path .. '?time=' .. time .. '&token=' .. token
+  local apiUrl = url.build({
+    host = _g.api.host,
+    scheme = _g.api.scheme,
+    port = _g.api.port,
+    path = path,
+    query = query,
+  })
+  return apiUrl
 end
 
 --用户登录
@@ -82,12 +118,12 @@ end
 
 --加入群
 --
---
+--@example joinGroup(1001) or joinGroup(10, 1)
 function joinGroup(...)
   if #arg == 1 then
     send({1001, arg[1]})
   elseif #arg ==2 then
-    send({1001, {vid=arg[1], vtype=arg[2]}})
+    send({1001, {receiver=arg[1], receiver_type=arg[2]}})
   end
 end
 
@@ -98,7 +134,7 @@ function leaveGroup(...)
   if #arg == 1 then
     send({1002, arg[1]})
   elseif #arg ==2 then
-    send({1002, {vid=arg[1], vtype=arg[2]}})
+    send({1002, {receiver=arg[1], receiver_type=arg[2]}})
   end
 end
 
@@ -214,7 +250,20 @@ end
 --
 --
 function getUnreadMsgcount(target, targetType)
-  return 0
+  local count = 0
+  local uid = getUser('uid')
+  if uid ~= nil then
+    local params = {['sender'] = target, ['receiver_type']=targetType}
+    local url = getApiUrl('/list/' .. uid, params)
+    local result = httpclient:get(url)
+    for k, v in pairs(result) do
+      print(k, v)
+    end
+    if result ~= nil then
+      count = result.total or 0
+    end
+  end
+  return count
 end
 
 --将和某个聊天对象的全部消息标记为已读
