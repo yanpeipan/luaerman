@@ -37,6 +37,7 @@ end
 --json 默认使用msgpack
 --return void
 function init(device, wsProtocol)
+  print("init start")
   _g.appkey = appkey
   _g.ws = {}
   _g.api = {}
@@ -57,17 +58,20 @@ function init(device, wsProtocol)
   _g.api.key = key or 'woRKeRmAn'
   --设置csjon
   cjson.encode_sparse_array(true)
+  print("init over")
 end
 
 --连接服务器
 --
 --
 function connectServer()
+  print("connectServer begin")
   local options = {timeout=_g.ws.timeout}
   _g.client = websocket.client:new(options)
   local wsProtocol = _g.ws.protocol
   local wsUrl = getWSUrl()
   local code, err = _g.client:connect(wsUrl, wsProtocol);
+  print("connectServer over")
   return code
 end
 
@@ -111,7 +115,9 @@ end
 --
 --
 function login(usr, psw)
+  print("login begin")
   send({1007, usr, psw})
+  print( "login over" )
   return true
 end
 
@@ -119,7 +125,9 @@ end
 --
 --
 function logout()
+  print("logout begin")
   send({1008})
+  print("logout over")
 end
 
 --加入群
