@@ -11,6 +11,7 @@ function onDelegate(event, table)
     data = cjson.encode({})
   end
   print(event, data)
+  javaCallbacks(event,data)
 end
 
 -- Protocol
