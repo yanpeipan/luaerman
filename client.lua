@@ -209,6 +209,7 @@ end
 --
 function receive()
   if _g.client ~= nil and _g.client.state == 'OPEN' then
+    local recvt,sendt,status = socket.select({_g.client.sock},nil,1)
     local message = _g.client:receive()
     if message == '[1003]' then
       message = cjson.decode(message)
