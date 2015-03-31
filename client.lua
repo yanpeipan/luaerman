@@ -37,7 +37,6 @@ end
 --json 默认使用msgpack
 --return void
 function init(device, wsProtocol)
-  print("init start")
   _g.appkey = appkey
   _g.ws = {}
   _g.api = {}
@@ -58,20 +57,17 @@ function init(device, wsProtocol)
   _g.api.key = key or 'woRKeRmAn'
   --设置csjon
   cjson.encode_sparse_array(true)
-  print("init over")
 end
 
 --连接服务器
 --
 --
 function connectServer()
-  print("connectServer begin")
   local options = {timeout=_g.ws.timeout}
   _g.client = websocket.client:new(options)
   local wsProtocol = _g.ws.protocol
   local wsUrl = getWSUrl()
   local code, err = _g.client:connect(wsUrl, wsProtocol);
-  print("connectServer over")
   return code
 end
 
@@ -115,9 +111,7 @@ end
 --
 --
 function login(usr, psw)
-  print("login begin")
   send({1007, usr, psw})
-  print( "login over" )
   return true
 end
 
@@ -125,9 +119,7 @@ end
 --
 --
 function logout()
-  print("logout begin")
   send({1008})
-  print("logout over")
 end
 
 --加入群
@@ -215,9 +207,8 @@ end
 --接受消息
 --
 --
-function receive()
+function receive_sync()
   if _g.client ~= nil and _g.client.state == 'OPEN' then
-    local recvt,sendt,status = socket.select({_g.client.sock},nil,1)
     local message = _g.client:receive()
     if message == '[1003]' then
       message = cjson.decode(message)
@@ -229,6 +220,15 @@ function receive()
       end
     end
     onmessage(message)
+  end
+end
+
+function receive()
+  if _g.client ~= nil and _g.client.state == 'OPEN' then
+    local recvt,sendt,status = socket.select({_g.client.sock},nil,1)
+    if #recvt > 0 then
+      receive_sync()
+    end
   end
 end
 
@@ -348,14 +348,3 @@ end
 --
 function activeSession(target, type)
 end
-
-
-init('android')
-local conn = connectServer()
-print(conn)
--- login('18600218174', '19891015')
--- print(getUnreadMsgcountByType(0))
---logout()
-
---joinGroup(1)
---leaveGroup(1)
