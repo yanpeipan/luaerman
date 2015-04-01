@@ -28,7 +28,7 @@ local protocol = function()
     --user = {'icon', 'name', 'nickname', 'uid'} or {}
     [1001] = function(_, group, user)
       if user ~= nil then
-        if user.uid == nil or user.uid ~= _.user.uid then
+        if user.uid == nil or user.uid == _.user.uid then
           onDelegate(eventCodes['GotyeEventCodeJoinGroup'], {["code"]=codes["CODE_OK"], ["group"]=group})
         else
           onDelegate(eventCodes['GotyeEventCodeUserJoinGroup'], {['group']=group, ['user']=user})
