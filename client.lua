@@ -8,7 +8,7 @@ local msgpack = require"MessagePack"
 local cjson = require"cjson"
 local md5 = require"md5"
 local httpclient = require"httpclient".new()
-local url = require"socket.url"
+local url = require"url"
 
 --client全局变量
 local _g = {
@@ -139,8 +139,10 @@ end
 function leaveGroup(...)
   if #arg == 1 then
     send({1002, arg[1]})
+    print('client.lua leaveGroup param arg[1]: '..arg[1])
   elseif #arg ==2 then
     send({1002, {receiver=arg[1], receiver_type=arg[2]}})
+    print('client.lua leaveGroup param arg[1]: '..arg[1]..";arg[2]:"..arg[2])
   end
 end
 
@@ -238,6 +240,7 @@ end
 function onmessage(message)
   if type(message) == 'table' and #message > 0 then
     local code = assert(message[1])
+    print("onmessage code:"..code)
     local callback = protocol.parse(code)
     table.remove(message, 1)
     callback(_g, unpack(message))

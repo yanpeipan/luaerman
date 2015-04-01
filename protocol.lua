@@ -10,7 +10,7 @@ function onDelegate(event, table)
   else
     data = cjson.encode({})
   end
-  print(event, data)
+  print("protocol.lua onDelegate event:"..event..";data: "..data)
   javaCallbacks(event,data)
 end
 
