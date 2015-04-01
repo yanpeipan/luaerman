@@ -348,17 +348,3 @@ end
 --
 function activeSession(target, type)
 end
-<<<<<<< HEAD
-
-
--- init('android')
--- local conn = connectServer()
--- print(conn)
--- login('18600218174', '19891015')
--- print(getUnreadMsgcountByType(0))
---logout()
-
---joinGroup(1)
---leaveGroup(1)
-=======
->>>>>>> d6f4972a6871c65e3bd4f45119edf93ec027363b
