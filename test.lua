@@ -16,7 +16,7 @@ connectServer()
 --);
 --CREATE TABLE `message` IF NOT EXISTS(
 --`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
---`send` INTEGER NOT NULL,
+--`sender` INTEGER NOT NULL,
 --`receiver` INTEGER NOT NULL,
 --`receiver_type` INTEGER NOT NULL,
 --`message` TEXT NOT NULL,
@@ -33,14 +33,15 @@ call('login', '18600218174', '19891015')
 call('receive')
 --print(getter('user'))
 
-call('joinGroup', 1)
+call('joinGroup', 103)
 call('receive')
 --call('requestGroupMemberlist', 1)
 --call('receive')
 
 call('sendText', 1, 3, {'hello'})
+call('receive')
 --call('leaveGroup', 1)
---call('receive')
+call('receive')
 --call('receive')
 --call('receive')
 --

@@ -3,6 +3,9 @@ local codes = require'code'
 local msgpack = require'MessagePack'
 local eventCodes = require'eventCodes'
 
+function javaCallbacks()
+end
+
 function onDelegate(event, table)
   local data = table or {}
   if type(data) == 'table' then
@@ -10,8 +13,8 @@ function onDelegate(event, table)
   else
     data = cjson.encode({})
   end
-  print(event, data)
-  --javaCallbacks(event,data)
+  print("protocol.lua onDelegate event:"..event..";data: "..data)
+  javaCallbacks(event,data)
 end
 
 -- Protocol
@@ -49,7 +52,16 @@ local protocol = function()
       _.client:send(message)
     end,
     [1004] = function(_, target, message)
-      onDelegate(eventCodes['GotyeEventCodeReceiveMessage'], {['target']=target, ['message']=message})
+      if _.user ~= nil and _.user.uid == message.sender then
+        onDelegate(eventCodes['GotyeEventCodeSendMessage'], {['target']=target, ['message']=message})
+      else
+        onDelegate(eventCodes['GotyeEventCodeReceiveMessage'], {['target']=target, ['message']=message})
+        local sender = message.sender
+        local receiver = target.receiver
+        local receiver_type = target.receiver_type
+        local message = msgpack.pack(message.msg)
+        _g.messageModel.save(sender, receiver, receiver_type, message)
+      end
     end,
     [1005] = function(_, target, members)
       onDelegate(eventCodes['GotyeEventCodeGetGroupUserList'], {['target']=target, ['members']=members})
@@ -72,7 +84,6 @@ local protocol = function()
   --
   --
   self.parse = function(code)
-    print(code)
     if code ~= nil and type(self.codes[code]) == "function" then
       return self.codes[code]
     else

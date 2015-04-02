@@ -9,7 +9,7 @@ local cjson = require"cjson"
 local md5 = require"md5"
 local httpclient = require"httpclient".new()
 local url = require"socket.url"
-local messageModel = require"messageModel"
+local MessageModel = require"messageModel"
 
 --client全局变量
 local _g = {
@@ -41,7 +41,8 @@ function init(device, wsProtocol)
   _g.appkey = appkey
   _g.ws = {}
   _g.api = {}
-  _g.sqlite = {path='/tmp/IMDB'}
+  _g.sqlite = {path='/Users/yan/IMDB'}
+  _g.messageModel = MessageModel.new(_g.sqlite)
   _g.device = device or ''
   _g.json = 'msgpack'
   _g.ws.protocol = wsProtocol or 'riverrun.binary.msgpack'
@@ -140,8 +141,10 @@ end
 function leaveGroup(...)
   if #arg == 1 then
     send({1002, arg[1]})
+    print('client.lua leaveGroup param arg[1]: '..arg[1])
   elseif #arg ==2 then
     send({1002, {receiver=arg[1], receiver_type=arg[2]}})
+    print('client.lua leaveGroup param arg[1]: '..arg[1]..";arg[2]:"..arg[2])
   end
 end
 
@@ -149,13 +152,18 @@ end
 --
 --
 function sendText(receiver, receiverType, text)
-  if type(text) == 'string' then
-    json = assert(cjson.decode(text))
-  elseif type(text) == 'table' then
-    local message = cjson.encode(text)
+  local sender = _g.user.uid or 0
+  local message = {
+    sender = sender
+  }
+  if type(text) == 'table' then
+    message.msg = msgpack.pack(text)
+  else
+    message.msg = text
   end
-  --send({1004, {['receiver']=receiver, ['receiver_type']=receiverType}, message})
-  --message.save(_g.user.uid, receiver, receiver_type, message)
+  local id, errmsg = _g.messageModel:save(_g.user.uid, receiver, receiverType, message.msg)
+  message.msgid = id
+  send({1004, {['receiver']=receiver, ['receiver_type']=receiverType}, message})
   --onSendMessage(0, message)
 end
 
@@ -239,6 +247,7 @@ end
 function onmessage(message)
   if type(message) == 'table' and #message > 0 then
     local code = assert(message[1])
+    print("onmessage code:"..code)
     local callback = protocol.parse(code)
     table.remove(message, 1)
     callback(_g, unpack(message))
@@ -253,7 +262,7 @@ function getUser(key)
   return value
 end
 
---获取对应消息类型的所有未读个数
+--获取对应消息send的所有未读个数
 --targetType ：0：单聊； 1：聊天室； 2：群聊
 --
 function getUnreadMsgcountByType(targetType)
