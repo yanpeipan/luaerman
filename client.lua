@@ -9,6 +9,7 @@ local cjson = require"cjson"
 local md5 = require"md5"
 local httpclient = require"httpclient".new()
 local url = require"socket.url"
+local messageModel = require"messageModel"
 
 --client全局变量
 local _g = {
@@ -149,12 +150,12 @@ end
 --
 function sendText(receiver, receiverType, text)
   if type(text) == 'string' then
-    text = assert(cjson.decode(text))
+    json = assert(cjson.decode(text))
+  elseif type(text) == 'table' then
+    local message = cjson.encode(text)
   end
-  if type(text) == 'table' then
-    local message = {}
-    send({1004, {['receiver']=receiver, ['receiver_type']=receiverType}, message})
-  end
+  --send({1004, {['receiver']=receiver, ['receiver_type']=receiverType}, message})
+  --message.save(_g.user.uid, receiver, receiver_type, message)
   --onSendMessage(0, message)
 end
 

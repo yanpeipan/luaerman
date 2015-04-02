@@ -11,7 +11,7 @@ function onDelegate(event, table)
     data = cjson.encode({})
   end
   print(event, data)
-  javaCallbacks(event,data)
+  --javaCallbacks(event,data)
 end
 
 -- Protocol
@@ -72,6 +72,7 @@ local protocol = function()
   --
   --
   self.parse = function(code)
+    print(code)
     if code ~= nil and type(self.codes[code]) == "function" then
       return self.codes[code]
     else

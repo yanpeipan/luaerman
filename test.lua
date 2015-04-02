@@ -23,7 +23,7 @@ connectServer()
 --`time` TEXT DEFAULT CURRENT_TIMESTAMP
 --);
 --CREATE TABLE `session` IF NOT EXISTS(
---`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+--`id` INTEGER NOT NULL PRIMARY KEY AUTOINCRE
 --`target` INTEGER NOT NULL,
 --`time` INTEGER NOT NULL
 --);
@@ -38,8 +38,11 @@ call('receive')
 --call('requestGroupMemberlist', 1)
 --call('receive')
 
---call('sendText', 1, 3, {'hello'})
+call('sendText', 1, 3, {'hello'})
 --call('leaveGroup', 1)
+--call('receive')
+--call('receive')
+--call('receive')
 --
 --call('receive')
 --call('logout')
@@ -49,3 +52,4 @@ call('receive')
 --print(getUnreadMsgcount(1, 0))
 --print(getTargetDetail(233555))
 --print(markMessagesAsread(233555))
+--
