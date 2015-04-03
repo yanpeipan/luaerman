@@ -88,4 +88,4 @@ function messageModel:delete(sender, receiver, receiver_type)
   return columns or 0, self.db:errmsg()
 end
 
-  return m
+return m
