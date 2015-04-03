@@ -31,18 +31,16 @@ connectServer()
 
 call('login', '18600218174', '19891015')
 call('receive')
---print(getter('user'))
-
-call('joinGroup', 103)
+--print(getter('user')) call('joinGroup', 103)
 call('receive')
 --call('requestGroupMemberlist', 1)
 --call('receive')
 
-print(getSessionlist())
-call('sendText', 1, 3, {'hello'})
-call('receive')
-print(getSessionlist())
-deleteSession()
+--print(getSessionlist())
+--call('sendText', 1, 3, {'hello'})
+--call('receive')
+--print(getSessionlist())
+--deleteSession()
 --call('leaveGroup', 1)
 --call('receive')
 --call('receive')
@@ -53,7 +51,6 @@ deleteSession()
 
 --
 --
---print(getUnreadMsgcount(1, 0))
---print(getTargetDetail(233555))
---print(markMessagesAsread(233555))
+print(getUnreadMsgcount(1, 0))
+--print(getTargetDetail(233555)) --print(markMessagesAsread(233555))
 --

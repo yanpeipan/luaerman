@@ -6,6 +6,10 @@ local m = {}
 m.new = function(sqlite)
   local sqlite = sqlite or {}
   local self = {}
+  self.status = {
+    read = 2,
+    unread = 1
+  }
   self.db = lsqlite3.open(sqlite.path)
   setmetatable(self, {__index = messageModel})
   return self

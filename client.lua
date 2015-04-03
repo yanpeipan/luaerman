@@ -270,7 +270,8 @@ function getUnreadMsgcountByType(targetType)
   local count = 0
   local uid = getUser('uid')
   if uid ~= nil then
-    local url = getApiUrl('/message/list/' .. uid)
+    local params = {['chatstatus'] = _g.messageModel.status.unread}
+    local url = getApiUrl('/message/list/' .. uid, params)
     local result = httpclient:get(url)
     if result ~= nil then
       count = result.total or 0
@@ -286,7 +287,7 @@ function getUnreadMsgcount(target, targetType)
   local count = 0
   local uid = getUser('uid')
   if uid ~= nil then
-    local params = {['sender'] = target, ['receiver_type']=targetType}
+    local params = {['sender'] = target, ['receiver_type']=targetType, ['chatstatus'] = _g.messageModel.status.unread}
     local url = getApiUrl('/message/list/' .. uid, params)
     local result = httpclient:get(url)
     if result ~= nil then
@@ -335,7 +336,6 @@ function deleteSession(target, type, removeMessage)
   local uid = getUser('uid')
   if uid ~= nil then
     local columns = _g.messageModel:delete(uid, target, type)
-    print(columns)
   end
 end
 
