@@ -22,7 +22,7 @@ function messageModel:save(sender, receiver, receiver_type, message, time)
   if errcode == 0 then
     time = time or os.time()
     stmt:bind_values(sender, receiver, receiver_type, message)
-    stmt:step()
+    local code = stmt:step()
     lastInsertId = stmt:last_insert_rowid()
     stmt:reset()
   end
@@ -31,10 +31,61 @@ end
 
 function messageModel:get(sender, receiver, receiver_type)
   local sql = 'SELECT * FROM message WHERE '
-  local values = {}
-  if sender ~= nil then
-    values.sender = sender
+  local getNamedValues = {}
+  local values = {
+    sender = sender,
+    receiver = receiver,
+    receiver_type = receiver_type
+  }
+  local conditions = {}
+  local bindValues = {}
+  for k,v in pairs(values) do
+    if v ~= nil then
+      table.insert(conditions, k .. '=?')
+      table.insert(bindValues, v)
+    end
   end
+  sql = sql .. table.concat(conditions, ',')
+  local stmt = self.db:prepare(sql)
+  local errcode = self.db:errcode()
+  if errcode == 0 then
+    stmt:bind_values(unpack(bindValues))
+    local code = stmt:step()
+    if code == 101 then
+      stmt:reset()
+    else
+      getNamedValues = stmt:get_named_values()
+    end
+  end
+  return getNamedValues or {}, self.db:errmsg()
 end
 
-return m
+function messageModel:delete(sender, receiver, receiver_type)
+  local sql = 'DELETE FROM message where '
+  local values = {
+    sender = sender,
+    receiver = receiver,
+    receiver_type = receiver_type
+  }
+  local conditions = {}
+  local bindValues = {}
+  local columns = 0
+  for k, v in pairs(values) do
+    if v ~= nil then
+      table.insert(conditions, k .. '=?')
+      table.insert(bindValues, v)
+    end
+  end
+  sql = sql .. table.concat(conditions, ',')
+  local stmt = self.db:prepare(sql)
+  local errcode = self.db:errcode()
+  if errcode == 0 then
+    stmt:bind_values(unpack(bindValues))
+    stmt:step()
+    column = stmt:columns()
+    stmt:reset()
+  end
+  return columns or 0, self.db:errmsg()
+end
+
+  return m

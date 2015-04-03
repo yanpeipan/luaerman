@@ -178,6 +178,7 @@ end
 --
 --
 function clearCache()
+  _g.messageModel:delete(uid)
 end
 
 --设置是否每次登录后自动获取离线消息
@@ -269,7 +270,7 @@ function getUnreadMsgcountByType(targetType)
   local count = 0
   local uid = getUser('uid')
   if uid ~= nil then
-    local url = getApiUrl('/list/' .. uid)
+    local url = getApiUrl('/message/list/' .. uid)
     local result = httpclient:get(url)
     if result ~= nil then
       count = result.total or 0
@@ -286,7 +287,7 @@ function getUnreadMsgcount(target, targetType)
   local uid = getUser('uid')
   if uid ~= nil then
     local params = {['sender'] = target, ['receiver_type']=targetType}
-    local url = getApiUrl('/list/' .. uid, params)
+    local url = getApiUrl('/message/list/' .. uid, params)
     local result = httpclient:get(url)
     if result ~= nil then
       count = result.total or 0
@@ -316,18 +317,38 @@ end
 --
 --
 function getLastMessage(target, type)
+  local uid = getUser('uid')
+  if uid ~= nil then
+    local params = {['sender'] = target, ['receiver_type']=targetType, ['size']=1}
+    local url = getApiUrl('/message/' .. uid, params)
+    local result = httpclient:get(url)
+    if result ~= nil then
+      count = result.total or 0
+    end
+  end
 end
 
 --删除会话
 --
 --
 function deleteSession(target, type, removeMessage)
+  local uid = getUser('uid')
+  if uid ~= nil then
+    local columns = _g.messageModel:delete(uid, target, type)
+    print(columns)
+  end
 end
 
 --获取回话列表
 --
 --
 function getSessionlist()
+  local uid = getUser('uid')
+  local sessionList = {}
+  if uid ~= nil then
+    sessionList = _g.messageModel:get(uid)
+  end
+  return cjson.encode(sessionList)
 end
 
 --获取用户详情
