@@ -12,6 +12,7 @@ m.new = function(sqlite)
   }
   self.db = lsqlite3.open(sqlite.path)
   setmetatable(self, {__index = messageModel})
+  self:init()
   return self
 end
 

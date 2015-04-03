@@ -40,7 +40,7 @@ local protocol = function()
     end,
     [1002] = function(_, group, user)
       if user ~= nil then
-        if user.uid == nil or user.uid ~= _.user.uid then
+        if user.uid == nil or user.uid == _.user.uid then
           onDelegate(eventCodes['GotyeEventCodeLeaveGroup'], {['code']=codes["CODE_OK"], ['group']=group})
         else
           onDelegate(eventCodes['GotyeEventCodeUserLeaveGroup'], {['group']=group, ['user']=user})
@@ -60,7 +60,8 @@ local protocol = function()
         local receiver = target.receiver
         local receiver_type = target.receiver_type
         local message = msgpack.pack(message.msg)
-        _g.messageModel.save(sender, receiver, receiver_type, message)
+        --_g.messageModel.add(sender, receiver, receiver_type, message)
+        _g.sessionModel.add(sender, receiver, receiver_type)
       end
     end,
     [1005] = function(_, target, members)

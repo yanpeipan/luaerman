@@ -42,15 +42,15 @@ function init(device, path, wsProtocol)
   _g.appkey = appkey
   _g.ws = {}
   _g.api = {}
+  _g.device = device or ''
+  _g.json = 'msgpack'
+  _g.ws.protocol = wsProtocol or 'riverrun.binary.msgpack'
   --Sqlite
   _g.sqlite = {['path']=path}
   _g.messageModel = MessageModel.new(_g.sqlite)
   _g.sessionModel = SessionModel.new(_g.sqlite)
   _g.messageModel:init()
-  print(_g.sessionModel:init(), 'xcxcvxcv')
-  _g.device = device or ''
-  _g.json = 'msgpack'
-  _g.ws.protocol = wsProtocol or 'riverrun.binary.msgpack'
+  _g.sessionModel:init()
   --WS参数
   _g.ws.host = 'ws.me2.tv'
   _g.ws.host = '192.168.1.16'
@@ -103,7 +103,6 @@ function getApiUrl(path, params)
   for k,v in pairs(params) do
     query = query .. k .. '=' .. v .. '&'
   end
-  --return _g.api .. path .. '?time=' .. time .. '&token=' .. token
   local apiUrl = url.build({
     host = _g.api.host,
     scheme = _g.api.scheme,
@@ -112,6 +111,35 @@ function getApiUrl(path, params)
     query = query,
   })
   return apiUrl
+end
+
+--获取服务器对应的receiver&receiver_type
+--
+function getReceiver(target, targetType)
+  local receiver
+  local receiver_type
+  if target_type ==0 then
+    receiver = target
+    receiverType = 2
+  else
+    receiver = math.floor(target / 100)
+    receiver_type = target % 100
+  end
+  return receiver, receiver_type
+end
+
+--获取亲加对应的target, targetType
+--
+function getTarget(receiver, receiver_type)
+  local target
+  local targetType
+  if receiver_type == 2 then
+    target = receiver
+    targetType = 0
+  else
+    target = receiver * 100 + receiver_type
+    targeType = 2
+  end
 end
 
 --用户登录
@@ -166,7 +194,8 @@ function sendText(receiver, receiverType, text)
   else
     message.msg = text
   end
-  local id, errmsg = _g.messageModel:add(_g.user.uid, receiver, receiverType, message.msg)
+  local id, errmsg = _g.sessionModel:add(sender, receiver, receiverType)
+  print(id, errmsg)
   message.msgid = id
   if receiver_type == 2 then
     send({1004, receiver, messsage})
@@ -188,6 +217,7 @@ end
 --
 function clearCache()
   _g.messageModel:delete(uid)
+  _g.sessionModel:delete(uid)
 end
 
 --设置是否每次登录后自动获取离线消息
@@ -326,14 +356,19 @@ end
 --获取对应Target的最后一条消息
 --
 --
-function getLastMessage(target, type)
+function getLastMessage(target, targetType)
   local uid = getUser('uid')
+  local receiver, receiverType = getReceiver(target, targetType)
   if uid ~= nil then
-    local params = {['sender'] = target, ['receiver_type']=targetType, ['size']=1}
-    local url = getApiUrl('/message/' .. uid, params)
+    local params = {['sender']=uid, ['receiver']=receiver, ['receiver_type']=receiverType, ['size']=1} local url = getApiUrl('/message/' , params)
+    print(url)
     local result = httpclient:get(url)
-    if result ~= nil then
-      count = result.total or 0
+
+    if result ~= nil and result.code == 200 then
+      local json = cjson.decode(result.body)
+      if json ~= nil and json.messages ~= nil then
+        return cjson.encode(json.messages[1])
+      end
     end
   end
 end
@@ -344,7 +379,7 @@ end
 function deleteSession(target, type, removeMessage)
   local uid = getUser('uid')
   if uid ~= nil then
-    local columns = _g.messageModel:delete(uid, target, type)
+    local columns = _g.sessionModel:delete(uid, target, type)
   end
 end
 
