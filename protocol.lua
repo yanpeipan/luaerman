@@ -53,9 +53,9 @@ local protocol = function()
     end,
     [1004] = function(_, target, message)
       if _.user ~= nil and _.user.uid == message.sender then
-        onDelegate(eventCodes['GotyeEventCodeSendMessage'], {['target']=target, ['message']=message})
+        onDelegate(eventCodes['GotyeEventCodeSendMessage'], {['target']=target, ['message']=message.msg})
       else
-        onDelegate(eventCodes['GotyeEventCodeReceiveMessage'], {['target']=target, ['message']=message})
+        onDelegate(eventCodes['GotyeEventCodeReceiveMessage'], {['target']=target, ['message']=message.msg})
         local sender = message.sender
         local receiver = target.receiver
         local receiver_type = target.receiver_type
@@ -73,6 +73,7 @@ local protocol = function()
       onDelegate(eventCodes['GotyeEventCodeLogin'], {['code']=code, ['user']=user})
     end,
     [1008] = function(_, code)
+      print('1008' .. code)
       if code == 0 then
         _.user = nil
       end

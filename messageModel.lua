@@ -28,7 +28,7 @@ function messageModel:init()
   return a, self.db:errmsg()
 end
 
-function messageModel:save(sender, receiver, receiver_type, message, time)
+function messageModel:add(sender, receiver, receiver_type, message, time)
   local sql = 'INSERT INTO message (sender, receiver, receiver_type, message) VALUES (?, ?, ?, ?)'
   local stmt = self.db:prepare(sql)
   local errcode = self.db:errcode()

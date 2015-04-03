@@ -10,6 +10,7 @@ local md5 = require"md5"
 local httpclient = require"httpclient".new()
 local url = require"socket.url"
 local MessageModel = require"messageModel"
+local SessionModel = require"sessionModel"
 
 --client全局变量
 local _g = {
@@ -41,9 +42,12 @@ function init(device, path, wsProtocol)
   _g.appkey = appkey
   _g.ws = {}
   _g.api = {}
+  --Sqlite
   _g.sqlite = {['path']=path}
   _g.messageModel = MessageModel.new(_g.sqlite)
+  _g.sessionModel = SessionModel.new(_g.sqlite)
   _g.messageModel:init()
+  print(_g.sessionModel:init(), 'xcxcvxcv')
   _g.device = device or ''
   _g.json = 'msgpack'
   _g.ws.protocol = wsProtocol or 'riverrun.binary.msgpack'
@@ -162,9 +166,13 @@ function sendText(receiver, receiverType, text)
   else
     message.msg = text
   end
-  local id, errmsg = _g.messageModel:save(_g.user.uid, receiver, receiverType, message.msg)
+  local id, errmsg = _g.messageModel:add(_g.user.uid, receiver, receiverType, message.msg)
   message.msgid = id
-  send({1004, {['receiver']=receiver, ['receiver_type']=receiverType}, message})
+  if receiver_type == 2 then
+    send({1004, receiver, messsage})
+  elseif receiver_type == 0 then
+    send({1004, {['receiver']=receiver, ['receiver_type']=2}, message})
+  end
   --onSendMessage(0, message)
 end
 
@@ -347,7 +355,7 @@ function getSessionlist()
   local uid = getUser('uid')
   local sessionList = {}
   if uid ~= nil then
-    sessionList = _g.messageModel:get(uid)
+    sessionList = _g.sessionModel:get(uid)
   end
   return cjson.encode(sessionList)
 end
