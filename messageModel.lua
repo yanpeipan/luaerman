@@ -15,6 +15,19 @@ m.new = function(sqlite)
   return self
 end
 
+function messageModel:init()
+  local a=self.db:exec[=[
+  CREATE TABLE IF NOT EXISTS `message` ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  `sender` INTEGER NOT NULL,
+  `receiver` INTEGER NOT NULL,
+  `receiver_type` INTEGER NOT NULL,
+  `message` TEXT NOT NULL,
+  `time` TEXT DEFAULT CURRENT_TIMESTAMP
+  );
+  ]=]
+  return a, self.db:errmsg()
+end
+
 function messageModel:save(sender, receiver, receiver_type, message, time)
   local sql = 'INSERT INTO message (sender, receiver, receiver_type, message) VALUES (?, ?, ?, ?)'
   local stmt = self.db:prepare(sql)

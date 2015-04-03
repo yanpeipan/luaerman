@@ -1,13 +1,12 @@
 require'client'
 local sqlite=require'lsqlite3'
-init('android')
+init('android', '/Users/yan/IMDB')
 connectServer()
 
 --local db=sqlite.open('/Users/yan/IMDB')
 -- {"user":{"nickname":"天才少年","uid":"233555","name":"18600218174","icon":"http:\/\/avatar-img.b0.upaiyun.com\/imgface\/origin\/2014-12\/c06f44cdea5f94829f441493f4b3089f.jpg!180x180"},"code":0}
 --
---local a=db:exec[=[
---CREATE TABLE `user` IF NOT EXISTS(
+--local a=db:exec[=[ --CREATE TABLE `user` IF NOT EXISTS(
 --`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 --`nickname` TEXT NOT NULL,
 --`name` TEXT NOT NULL,

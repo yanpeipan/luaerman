@@ -37,12 +37,13 @@ end
 --timeout 默认不超时
 --json 默认使用msgpack
 --return void
-function init(device, wsProtocol)
+function init(device, path, wsProtocol)
   _g.appkey = appkey
   _g.ws = {}
   _g.api = {}
-  _g.sqlite = {path='/Users/yan/IMDB'}
+  _g.sqlite = {['path']=path}
   _g.messageModel = MessageModel.new(_g.sqlite)
+  _g.messageModel:init()
   _g.device = device or ''
   _g.json = 'msgpack'
   _g.ws.protocol = wsProtocol or 'riverrun.binary.msgpack'
