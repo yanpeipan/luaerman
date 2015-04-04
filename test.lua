@@ -19,6 +19,7 @@ print(getLastMessage(103, 2)) --返回json数据格式不对
 --deleteSession()
 print(getUnreadMsgcount(1, 0))
 print(getUnreadMsgcountByType(0))
+--print(markSingleMessages()) --服务器未实现
 --print(markMessagesAsread(233555)) --服务器未实现
 --print(getTargetDetail(233555)) --弃用
 
