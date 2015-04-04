@@ -339,7 +339,7 @@ end
 --将和某个聊天对象的全部消息标记为已读
 --
 --
-function markMessagesAsread(target, targetType)
+function markMessagesAsread(target, targetType, status)
   local uid = getUser('uid')
   local resultTable = {}
   if uid ~= nil then
@@ -361,7 +361,6 @@ function getLastMessage(target, targetType)
   local receiver, receiverType = getReceiver(target, targetType)
   if uid ~= nil then
     local params = {['sender']=uid, ['receiver']=receiver, ['receiver_type']=receiverType, ['size']=1} local url = getApiUrl('/message/' , params)
-    print(url)
     local result = httpclient:get(url)
     if result ~= nil and result.code == 200 then
       local json = cjson.decode(result.body)

@@ -4,6 +4,8 @@ connectServer()
 
 call('login', '18600218174', '19891015')
 call('receive')
+call('receive')
+call('receive')
 
 --call('joinGroup', 103)
 --call('receive')
@@ -11,14 +13,14 @@ call('receive')
 --call('requestGroupMemberlist', 1)
 --call('receive')
 
---call('sendText', 103, 2, {'hello'})
+call('sendText', 103, 2, {'hello'})
 call('receive')
 
---print(getLastMessage(103, 2))
+print(getLastMessage(103, 2))
 
 print(getSessionlist())
 --
---deleteSession()
+deleteSession()
 
 --call('leaveGroup', 1)
 --call('receive')

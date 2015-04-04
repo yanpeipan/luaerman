@@ -32,13 +32,13 @@ function sessionModel:init()
 end
 
 function sessionModel:add(uid, target, target_type, target_name)
-  local sql = 'INSERT OR REPLACE INTO session VALUES (?, ?, ?, ?, ?, ?)'
+  local sql = 'INSERT OR REPLACE INTO session VALUES (?, ?, ?, ?, ?, datetime())'
   local stmt = self.db:prepare(sql)
   local errcode = self.db:errcode()
   local lastInsertId = 0
   target_name = target_name or ''
   if errcode == 0 then
-    stmt:bind_values(nil, uid, target, target_type, target_name, os.time())
+    stmt:bind_values(nil, uid, target, target_type, target_name)
     local code = stmt:step()
     lastInsertId = stmt:last_insert_rowid()
     stmt:reset()
