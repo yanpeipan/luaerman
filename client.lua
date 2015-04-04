@@ -184,8 +184,9 @@ end
 --发送消息
 --
 --
-function sendText(receiver, receiverType, text)
+function sendText(target, targetType, text)
   local sender = _g.user.uid or 0
+  local receiver, receiverType = getReceiver(target, targetType)
   local message = {
     sender = sender
   }
@@ -195,13 +196,13 @@ function sendText(receiver, receiverType, text)
     message.msg = text
   end
   local id, errmsg = _g.sessionModel:add(sender, receiver, receiverType)
-  print(id, errmsg)
   message.msgid = id
-  if receiver_type == 2 then
-    send({1004, receiver, messsage})
-  elseif receiver_type == 0 then
-    send({1004, {['receiver']=receiver, ['receiver_type']=2}, message})
-  end
+  send({1004, {['receiver']=receiver, ['receiver_type']=receiverType}, message})
+  --if receiver_type == 2 then
+  --  send({1004, receiver, messsage})
+  --elseif receiver_type == 0 then
+  --  send({1004, {['receiver']=receiver, ['receiver_type']=2}, message})
+  --end
   --onSendMessage(0, message)
 end
 
@@ -308,8 +309,9 @@ end
 function getUnreadMsgcountByType(targetType)
   local count = 0
   local uid = getUser('uid')
+  local _, receiverType = getReceiver(0, targetType)
   if uid ~= nil then
-    local params = {['chatstatus'] = _g.messageModel.status.unread}
+    local params = {['chatstatus'] = _g.messageModel.status.unread, ['receiver_type'] = receiverType}
     local url = getApiUrl('/message/list/' .. uid, params)
     local result = httpclient:get(url)
     if result ~= nil then
@@ -325,8 +327,9 @@ end
 function getUnreadMsgcount(target, targetType)
   local count = 0
   local uid = getUser('uid')
+  local receiver, receiverType = getReceiver(target, targetType)
   if uid ~= nil then
-    local params = {['sender'] = target, ['receiver_type']=targetType, ['chatstatus'] = _g.messageModel.status.unread}
+    local params = {['sender'] = receiver, ['receiver_type']=receiverType, ['chatstatus'] = _g.messageModel.status.unread}
     local url = getApiUrl('/message/list/' .. uid, params)
     local result = httpclient:get(url)
     if result ~= nil then
@@ -350,7 +353,6 @@ function markMessagesAsread(target, targetType, status)
       resultTable = cjson.decode(result.body) or {}
     end
   end
-  return resultTable.status or 0
 end
 
 --获取对应Target的最后一条消息

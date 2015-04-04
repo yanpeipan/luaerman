@@ -55,13 +55,14 @@ local protocol = function()
       if _.user ~= nil and _.user.uid == message.sender then
         onDelegate(eventCodes['GotyeEventCodeSendMessage'], {['target']=target, ['message']=message.msg})
       else
-        onDelegate(eventCodes['GotyeEventCodeReceiveMessage'], {['target']=target, ['message']=message.msg})
         local sender = message.sender
         local receiver = target.receiver
-        local receiver_type = target.receiver_type
+        local receiverType = target.receiver_type
         local message = msgpack.pack(message.msg)
+        local target, targetType = getTarget(receiver, receiverType)
+        onDelegate(eventCodes['GotyeEventCodeReceiveMessage'], {['target']=target, ['message']=message.msg})
         --_g.messageModel.add(sender, receiver, receiver_type, message)
-        _g.sessionModel.add(sender, receiver, receiver_type)
+        _g.sessionModel.add(uid, target, targetType, target)
       end
     end,
     [1005] = function(_, target, members)
