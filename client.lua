@@ -363,7 +363,6 @@ function getLastMessage(target, targetType)
     local params = {['sender']=uid, ['receiver']=receiver, ['receiver_type']=receiverType, ['size']=1} local url = getApiUrl('/message/' , params)
     print(url)
     local result = httpclient:get(url)
-
     if result ~= nil and result.code == 200 then
       local json = cjson.decode(result.body)
       if json ~= nil and json.messages ~= nil then
@@ -415,7 +414,15 @@ end
 --
 --
 function isOnline()
-  return _g.client ~= nil and _g.client.state == 'OPEN'
+  local status
+  if _g.client ~= nil and _g.client.state == 'OPEN' then
+    status = -1
+  elseif _g.user ~= nil and _g.user.uid ~= nil then
+    status = 1
+  else
+    status = 0
+  end
+  return status
 end
 
 --激活对应的会话session（这样收到的对应该Target的消息自动标记为已读）
