@@ -61,19 +61,15 @@ local protocol = function()
       _.client:send(message)
     end,
     [1004] = function(_, target, message)
-      --if _.user ~= nil and _.user.uid == message.sender then
-      if _.currentUser.isCurrentUser(message.sender) then
-        local target, targetType = getTarget(target.receiver, target.receiver_type)
-        onDelegate(eventCodes['GotyeEventCodeSendMessage'], {['target']=target, ['target_type']=targeType, ['message']=message.msg})
+      local sender = {['id']=message.sender, ['type']=0}
+      local target, targetType = getTarget(target.receiver, target.receiver_type)
+      local receiver = {['id']=target, ['type']=targeType}
+      local data = {['receiver']=receiver, ['sender']=sender, ['message']=message.msg}
+      if _.currentUser:isCurrentUser(message.sender) then
+        onDelegate(eventCodes['GotyeEventCodeSendMessage'], data)
       else
-        local sender = message.sender
-        local receiver = target.receiver
-        local receiverType = target.receiver_type
-        local message = msgpack.pack(message.msg)
-        local target, targetType = getTarget(receiver, receiverType)
-        onDelegate(eventCodes['GotyeEventCodeReceiveMessage'], {['target']=target, ['message']=message.msg})
-        --_g.messageModel.add(sender, receiver, receiver_type, message)
-        _g.sessionModel.add(uid, target, targetType, target)
+        onDelegate(eventCodes['GotyeEventCodeReceiveMessage'], data)
+        _g.sessionModel.add(uid, tartet, targetType, target)
       end
     end,
     [1005] = function(_, target, members)

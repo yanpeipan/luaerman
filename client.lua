@@ -144,6 +144,7 @@ function getTarget(receiver, receiver_type)
     target = receiver * 100 + receiver_type
     targeType = 2
   end
+  return target, targeType
 end
 
 --用户登录
@@ -282,7 +283,7 @@ end
 
 function receive()
   if _g.client ~= nil and _g.client.state == 'OPEN' then
-    local recvt,sendt,status = socket.select({_g.client.sock},nil,0.01)
+    local recvt,sendt,status = socket.select({_g.client.sock},nil,nil)
     if #recvt > 0 then
       receive_sync()
     end

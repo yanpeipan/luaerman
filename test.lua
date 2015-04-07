@@ -16,13 +16,13 @@ print(_g.currentUser.isLogin)
 call('joinGroup', 103)
 call('receive')
 
-call('requestGroupMemberlist', 103)
-call('receive')
-
---call('sendText', 103, 2, {'hello'})
+--call('requestGroupMemberlist', 103)
 --call('receive')
 
-print(getLastMessage(103, 2)) --返回json数据格式不对
+call('sendText', 103, 2, {'hello'})
+call('receive')
+
+--print(getLastMessage(103, 2)) --返回json数据格式不对
 --print(getSessionlist())
 --deleteSession()
 --print(getUnreadMsgcount(1, 0))
