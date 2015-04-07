@@ -276,15 +276,21 @@ end
 
 function receive()
   if _g.client ~= nil and _g.client.state == 'OPEN' then
-    local recvt,sendt,status = socket.select({_g.client.sock},nil,1)
+    local recvt,sendt,status = socket.select({_g.client.sock},nil,0.01)
     if #recvt > 0 then
       receive_sync()
     end
   elseif _g.client.state ~= 'RECONNECTING' then
     _g.client.state = 'RECONNECTING'
-    socket.select(nil, nil, 5)
-    connectServer()
-    onDelegate(eventCodes['GotyeEventCodeReconnecting'], {})
+    socket.sleep(5)
+    local status = connectServer()
+    local code
+    if status == true then
+      code = codes['CODE_OK']
+    else
+      code = codes['CODE_NETWORK_DISCONNECTED']
+    end
+    onDelegate(eventCodes['GotyeEventCodeReconnecting'], {['code']=code})
   end
 end
 

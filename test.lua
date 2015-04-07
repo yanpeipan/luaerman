@@ -1,6 +1,6 @@
 require'client'
 init('android', '/Users/yan/IMDB')
-connectServer()
+print(connectServer())
 
 call('login', '18600218174', '19891015')
 call('receive')
