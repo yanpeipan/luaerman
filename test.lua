@@ -1,24 +1,32 @@
 require'client'
+
+--local charTarget = require'ChatTarget'
+--local target = charTarget.new(1, 2)
+--print(target:get())
+
 init('android', '/Users/yan/IMDB')
-print(connectServer())
+print('connect server:', connectServer())
 
 call('login', '18600218174', '19891015')
 call('receive')
 
-call('joinGroup', 103)
-call('receive')
+local _g = getter()
+print(_g.currentUser.isLogin)
+
+--call('joinGroup', 103)
+--call('receive')
 
 --call('requestGroupMemberlist', 1)
 --call('receive')
 
-call('sendText', 103, 2, {'hello'})
-call('receive')
+--call('sendText', 103, 2, {'hello'})
+--call('receive')
 
-print(getLastMessage(103, 2)) --返回json数据格式不对
+--print(getLastMessage(103, 2)) --返回json数据格式不对
 --print(getSessionlist())
 --deleteSession()
-print(getUnreadMsgcount(1, 0))
-print(getUnreadMsgcountByType(0))
+--print(getUnreadMsgcount(1, 0))
+--print(getUnreadMsgcountByType(0))
 --print(markSingleMessages()) --服务器未实现
 --print(markMessagesAsread(233555)) --服务器未实现
 --print(getTargetDetail(233555)) --弃用

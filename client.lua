@@ -12,11 +12,10 @@ local url = require"socket.url"
 local MessageModel = require"messageModel"
 local SessionModel = require"sessionModel"
 local eventCodes = require'eventCodes'
+local User = require'User'
 
 --client全局变量
-local _g = {
-  user={},
-}
+local _g
 local protocol = protocol:new()
 
 --getter
@@ -40,9 +39,12 @@ end
 --json 默认使用msgpack
 --return void
 function init(device, path, wsProtocol)
-  _g.appkey = appkey
+  _g = {}
   _g.ws = {}
   _g.api = {}
+  _g.user = {}
+  _g.currentUser = User.new()
+  _g.appkey = appkey
   _g.device = device or ''
   _g.json = 'msgpack'
   _g.ws.protocol = wsProtocol or 'riverrun.binary.msgpack'
@@ -54,12 +56,11 @@ function init(device, path, wsProtocol)
   _g.sessionModel:init()
   --WS参数
   _g.ws.host = 'ws.me2.tv'
-  _g.ws.host = '192.168.1.16'
   _g.ws.port = '7272'
   _g.ws.scheme = 'ws'
   _g.ws.timeout = nil
   --API参数
-  _g.api.host = '192.168.1.16'
+  _g.api.host = 'ws.me2.tv'
   _g.api.port = '55252'
   _g.api.scheme = 'http'
   _g.api.key = key or 'woRKeRmAn'
@@ -129,7 +130,7 @@ function getReceiver(target, targetType)
   return receiver, receiver_type
 end
 
---获取亲加对应的target, targetType
+--获取亲加对应的target&targetType
 --
 function getTarget(receiver, receiver_type)
   local target
@@ -186,25 +187,28 @@ end
 --
 --
 function sendText(target, targetType, text)
-  local sender = _g.user.uid or 0
-  local receiver, receiverType = getReceiver(target, targetType)
-  local message = {
-    sender = sender
-  }
-  if type(text) == 'table' then
-    message.msg = msgpack.pack(text)
-  else
-    message.msg = text
+  if _g.currentUser.isLogin then
+    local sender = _g.currentUser:get('id')
+    local receiver, receiverType = getReceiver(target, targetType)
+    local message = {
+      sender = sender
+    }
+    if type(text) == 'table' then
+      message.msg = msgpack.pack(text)
+    else
+      message.msg = text
+    end
+    local id, errmsg = _g.sessionModel:add(sender, receiver, receiverType)
+    message.msgid = id
+    send({1004, {['receiver']=receiver, ['receiver_type']=receiverType}, message})
+    --if receiver_type == 2 then
+    --  send({1004, receiver, messsage})
+    --elseif receiver_type == 0 then
+    --  send({1004, {['receiver']=receiver, ['receiver_type']=2}, message})
+    --end
+    --onSendMessage(0, message)
+    --
   end
-  local id, errmsg = _g.sessionModel:add(sender, receiver, receiverType)
-  message.msgid = id
-  send({1004, {['receiver']=receiver, ['receiver_type']=receiverType}, message})
-  --if receiver_type == 2 then
-  --  send({1004, receiver, messsage})
-  --elseif receiver_type == 0 then
-  --  send({1004, {['receiver']=receiver, ['receiver_type']=2}, message})
-  --end
-  --onSendMessage(0, message)
 end
 
 --请求获取群成员列表
@@ -270,34 +274,35 @@ function receive_sync()
         message = assert(msgpack.unpack(message))
       end
     end
-    onmessage(message)
+    onMessage(message)
   end
 end
 
 function receive()
   if _g.client ~= nil and _g.client.state == 'OPEN' then
-    local recvt,sendt,status = socket.select({_g.client.sock},nil,0.01)
+    local recvt,sendt,status = socket.select({_g.client.sock},nil,nil)
     if #recvt > 0 then
       receive_sync()
     end
-  elseif _g.client.state ~= 'RECONNECTING' then
-    _g.client.state = 'RECONNECTING'
-    socket.sleep(5)
-    local status = connectServer()
-    local code
-    if status == true then
-      code = codes['CODE_OK']
-    else
-      code = codes['CODE_NETWORK_DISCONNECTED']
-    end
-    onDelegate(eventCodes['GotyeEventCodeReconnecting'], {['code']=code})
+    elseif _g.client.state ~= 'RECONNECTING' then
+      _g.client.state = 'RECONNECTING'
+      socket.sleep(5)
+      local status = connectServer()
+      local code
+      if status == true then
+        code = codes['CODE_OK']
+      else
+        code = codes['CODE_NETWORK_DISCONNECTED']
+      end
+      print('GotyeEventCodeReconnecting')
+      onDelegate(eventCodes['GotyeEventCodeReconnecting'], {['code']=code})
   end
 end
 
 --On Message
 --
 --
-function onmessage(message)
+function onMessage(message)
   if type(message) == 'table' and #message > 0 then
     local code = assert(message[1])
     print("onmessage code:"..code)
@@ -320,7 +325,7 @@ end
 --
 function getUnreadMsgcountByType(targetType)
   local count = 0
-  local uid = getUser('uid')
+  local uid = _g.currentUser:get('id')
   local _, receiverType = getReceiver(0, targetType)
   if uid ~= nil then
     local params = {['chatstatus'] = _g.messageModel.status.unread, ['receiver_type'] = receiverType}
@@ -338,9 +343,9 @@ end
 --
 function getUnreadMsgcount(target, targetType)
   local count = 0
-  local uid = getUser('uid')
-  local receiver, receiverType = getReceiver(target, targetType)
-  if uid ~= nil then
+  if _g.currentUser.isLogin then
+    local uid = _g.currentUser:get('id')
+    local receiver, receiverType = getReceiver(target, targetType)
     local params = {['sender'] = receiver, ['receiver_type']=receiverType, ['chatstatus'] = _g.messageModel.status.unread}
     local url = getApiUrl('/message/list/' .. uid, params)
     local result = httpclient:get(url)
@@ -355,9 +360,9 @@ end
 --
 --
 function markMessagesAsread(target, targetType, status)
-  local uid = getUser('uid')
-  local resultTable = {}
-  if uid ~= nil then
+  if _g.currentUser.isLogin then
+    local uid = _g.currentUser:get('id')
+    local resultTable = {}
     local apiUrl = getApiUrl('/message/' .. target)
     local data = ''
     local result = httpclient:put(apiUrl, data)
@@ -371,9 +376,9 @@ end
 --
 --
 function getLastMessage(target, targetType)
-  local uid = getUser('uid')
-  local receiver, receiverType = getReceiver(target, targetType)
-  if uid ~= nil then
+  if _g.currentUser.isLogin then
+    local uid = _g.currentUser:get('id')
+    local receiver, receiverType = getReceiver(target, targetType)
     local params = {['sender']=uid, ['receiver']=receiver, ['receiver_type']=receiverType, ['size']=1} local url = getApiUrl('/message/' , params)
     local result = httpclient:get(url)
     if result ~= nil and result.code == 200 then
@@ -389,8 +394,8 @@ end
 --
 --
 function deleteSession(target, type, removeMessage)
-  local uid = getUser('uid')
-  if uid ~= nil then
+  if _g.currentUser.isLogin then
+    local uid = _g.currentUser:get('id')
     local columns = _g.sessionModel:delete(uid, target, type)
   end
 end
@@ -430,16 +435,16 @@ function isOnline()
   local status
   if _g.client ~= nil and _g.client.state == 'OPEN' then
     status = -1
-  elseif _g.user ~= nil and _g.user.uid ~= nil then
-    status = 1
-  else
-    status = 0
+    elseif _g.currentUser.isLogin then
+      status = 1
+    else
+      status = 0
+    end
+    return status
   end
-  return status
-end
 
---激活对应的会话session（这样收到的对应该Target的消息自动标记为已读）
---
---
-function activeSession(target, type)
-end
+  --激活对应的会话session（这样收到的对应该Target的消息自动标记为已读）
+  --
+  --
+  function activeSession(target, type)
+  end

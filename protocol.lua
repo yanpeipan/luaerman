@@ -2,6 +2,7 @@ local cjson  = require'cjson'
 local codes = require'code'
 local msgpack = require'MessagePack'
 local eventCodes = require'eventCodes'
+local User = require'User'
 
 function javaCallbacks()
 end
@@ -30,21 +31,21 @@ local protocol = function()
     --join group
     --user = {'icon', 'name', 'nickname', 'uid'} or {}
     [1001] = function(_, group, user)
-      if user ~= nil then
-        if user.uid == nil or user.uid == _.user.uid then
-          onDelegate(eventCodes['GotyeEventCodeJoinGroup'], {["code"]=codes["CODE_OK"], ["group"]=group})
-        else
-          onDelegate(eventCodes['GotyeEventCodeUserJoinGroup'], {['group']=group, ['user']=user})
-        end
+      user = user or {}
+      group = group or {}
+      if _g.currentUser.isCurrentUser(user.uid) then
+        onDelegate(eventCodes['GotyeEventCodeJoinGroup'], {["code"]=codes["CODE_OK"], ["group"]=group})
+      else
+        onDelegate(eventCodes['GotyeEventCodeUserJoinGroup'], {['group']=group, ['user']=user})
       end
     end,
     [1002] = function(_, group, user)
-      if user ~= nil then
-        if user.uid == nil or user.uid == _.user.uid then
-          onDelegate(eventCodes['GotyeEventCodeLeaveGroup'], {['code']=codes["CODE_OK"], ['group']=group})
-        else
-          onDelegate(eventCodes['GotyeEventCodeUserLeaveGroup'], {['group']=group, ['user']=user})
-        end
+      user = user or {}
+      group = group or {}
+      if _g.currentUser.isCurrentUser(user.uid) then
+        onDelegate(eventCodes['GotyeEventCodeLeaveGroup'], {['code']=codes["CODE_OK"], ['group']=group})
+      else
+        onDelegate(eventCodes['GotyeEventCodeUserLeaveGroup'], {['group']=group, ['user']=user})
       end
     end,
     [1003] = function(_)
@@ -52,7 +53,8 @@ local protocol = function()
       _.client:send(message)
     end,
     [1004] = function(_, target, message)
-      if _.user ~= nil and _.user.uid == message.sender then
+      --if _.user ~= nil and _.user.uid == message.sender then
+      if _.currentUser.isCurrentUser(message.sender) then
         local target, targetType = getTarget(target.receiver, target.receiver_type)
         onDelegate(eventCodes['GotyeEventCodeSendMessage'], {['target']=target, ['target_type']=targeType, ['message']=message.msg})
       else
@@ -71,14 +73,15 @@ local protocol = function()
     end,
     [1007] = function(_, code, user)
       if code == 0 then
-        _.user = user
+        _.currentUser= User.new(user, true)
+        _.currentUser:set('isLogin', true)
       end
       onDelegate(eventCodes['GotyeEventCodeLogin'], {['code']=code, ['user']=user})
     end,
     [1008] = function(_, code)
       print('1008' .. code)
       if code == 0 then
-        _.user = nil
+        _.user = {isLogin=false}
       end
       onDelegate(eventCodes['GotyeEventCodeLogout'], {['code']=code})
     end,
