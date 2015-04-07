@@ -48,7 +48,7 @@ function messageModel:add(sender, receiver, receiver_type, message, time)
 end
 
 function messageModel:get(sender, receiver, receiver_type)
-  local sql = 'SELECT * FROM message WHERE '
+  local sql = 'SELECT *,  FROM message WHERE '
   local getNamedValues = {}
   local values = {
     sender = sender,
@@ -104,6 +104,10 @@ function messageModel:delete(sender, receiver, receiver_type)
     stmt:reset()
   end
   return columns or 0, self.db:errmsg()
+end
+
+function messageModel:markMessagesAsread()
+
 end
 
 return m

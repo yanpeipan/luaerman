@@ -11,6 +11,7 @@ local httpclient = require"httpclient".new()
 local url = require"socket.url"
 local MessageModel = require"messageModel"
 local SessionModel = require"sessionModel"
+local eventCodes = require'eventCodes'
 
 --client全局变量
 local _g = {
@@ -279,6 +280,11 @@ function receive()
     if #recvt > 0 then
       receive_sync()
     end
+  elseif _g.client.state ~= 'RECONNECTING' then
+    _g.client.state = 'RECONNECTING'
+    socket.select(nil, nil, 5)
+    connectServer()
+    onDelegate(eventCodes['GotyeEventCodeReconnecting'], {})
   end
 end
 

@@ -54,7 +54,7 @@ local protocol = function()
     [1004] = function(_, target, message)
       if _.user ~= nil and _.user.uid == message.sender then
         local target, targetType = getTarget(target.receiver, target.receiver_type)
-        onDelegate(eventCodes['GotyeEventCodeSendMessage'], {['target']=target, ['message']=message.msg})
+        onDelegate(eventCodes['GotyeEventCodeSendMessage'], {['target']=target, ['target_type']=targeType, ['message']=message.msg})
       else
         local sender = message.sender
         local receiver = target.receiver
