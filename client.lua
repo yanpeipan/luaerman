@@ -56,11 +56,13 @@ function init(device, path, wsProtocol)
   _g.sessionModel:init()
   --WS参数
   _g.ws.host = 'ws.me2.tv'
+  _g.ws.host = '192.168.1.16'
   _g.ws.port = '7272'
   _g.ws.scheme = 'ws'
   _g.ws.timeout = nil
   --API参数
   _g.api.host = 'ws.me2.tv'
+  _g.api.host = '192.168.1.16'
   _g.api.port = '55252'
   _g.api.scheme = 'http'
   _g.api.key = key or 'woRKeRmAn'
@@ -294,7 +296,6 @@ function receive()
       else
         code = codes['CODE_NETWORK_DISCONNECTED']
       end
-      print('GotyeEventCodeReconnecting')
       onDelegate(eventCodes['GotyeEventCodeReconnecting'], {['code']=code})
   end
 end

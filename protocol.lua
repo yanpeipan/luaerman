@@ -14,7 +14,15 @@ function onDelegate(event, table)
   else
     data = cjson.encode({})
   end
-  print("protocol.lua onDelegate event:"..event..";data: "..data)
+
+  --debug
+  local eventName
+  for k,v in pairs(eventCodes) do
+    if v == event then
+      eventName = k
+    end
+  end
+  print("protocol.lua onDelegate event:"..eventName..";data: "..data)
   javaCallbacks(event,data)
 end
 
@@ -33,7 +41,7 @@ local protocol = function()
     [1001] = function(_, group, user)
       user = user or {}
       group = group or {}
-      if _g.currentUser.isCurrentUser(user.uid) then
+      if _.currentUser:isCurrentUser(user.uid) then
         onDelegate(eventCodes['GotyeEventCodeJoinGroup'], {["code"]=codes["CODE_OK"], ["group"]=group})
       else
         onDelegate(eventCodes['GotyeEventCodeUserJoinGroup'], {['group']=group, ['user']=user})
@@ -73,13 +81,11 @@ local protocol = function()
     end,
     [1007] = function(_, code, user)
       if code == 0 then
-        _.currentUser= User.new(user, true)
-        _.currentUser:set('isLogin', true)
+        _.currentUser = User.new(user, true)
       end
       onDelegate(eventCodes['GotyeEventCodeLogin'], {['code']=code, ['user']=user})
     end,
     [1008] = function(_, code)
-      print('1008' .. code)
       if code == 0 then
         _.user = {isLogin=false}
       end

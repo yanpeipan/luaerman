@@ -13,16 +13,16 @@ call('receive')
 local _g = getter()
 print(_g.currentUser.isLogin)
 
---call('joinGroup', 103)
---call('receive')
+call('joinGroup', 103)
+call('receive')
 
---call('requestGroupMemberlist', 1)
---call('receive')
+call('requestGroupMemberlist', 103)
+call('receive')
 
 --call('sendText', 103, 2, {'hello'})
 --call('receive')
 
---print(getLastMessage(103, 2)) --返回json数据格式不对
+print(getLastMessage(103, 2)) --返回json数据格式不对
 --print(getSessionlist())
 --deleteSession()
 --print(getUnreadMsgcount(1, 0))
