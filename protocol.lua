@@ -65,11 +65,11 @@ local protocol = function()
       local target, targetType = getTarget(target.receiver, target.receiver_type)
       local receiver = {['id']=target, ['type']=targeType}
       local data = {['receiver']=receiver, ['sender']=sender, ['message']=message.msg}
+      _g.sessionModel.add(sender.id, tartet, targetType, target)
       if _.currentUser:isCurrentUser(message.sender) then
         onDelegate(eventCodes['GotyeEventCodeSendMessage'], data)
       else
         onDelegate(eventCodes['GotyeEventCodeReceiveMessage'], data)
-        _g.sessionModel.add(uid, tartet, targetType, target)
       end
     end,
     [1005] = function(_, target, members)
