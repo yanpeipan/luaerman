@@ -61,14 +61,24 @@ local protocol = function()
       _.client:send(message)
     end,
     [1004] = function(_, target, message)
-      local sender = {['id']=message.sender, ['type']=0}
+      --local sender = {['id']=message.sender, ['type']=0}
       local target, targetType = getTarget(target.receiver, target.receiver_type)
-      local receiver = {['id']=target, ['type']=targeType}
-      local data = {['receiver']=receiver, ['sender']=sender, ['message']=message.msg}
+      local data = {
+        ['receiver']=target,
+        ['receiver_type']=targetType,
+        ['sender']=message.sender,
+        ['sender_type']=0,
+        ['text']=message.msg,
+        ['date']=message.date
+      }
       if _.currentUser:isCurrentUser(message.sender) then
         onDelegate(eventCodes['GotyeEventCodeSendMessage'], data)
       else
-        _.sessionModel:add(sender.id, target, targetType, target)
+        if targetType == 0 then
+          _.sessionModel:add(_.currentUser:get('id'), sender, 0, sender)
+        else
+          _.sessionModel:add(_.currentUser:get('id'), target, targetType, target)
+        end
         onDelegate(eventCodes['GotyeEventCodeReceiveMessage'], data)
       end
     end,

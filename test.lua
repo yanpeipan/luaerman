@@ -4,7 +4,8 @@ require'client'
 --local target = charTarget.new(1, 2)
 --print(target:get())
 
-init('android', '/Users/yan/IMDB')
+init('android', '/Users/yan/IMDB', nil, nil)
+debug()
 print('connect server:', connectServer())
 
 call('login', '18600218174', '19891015')

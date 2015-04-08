@@ -8,7 +8,9 @@ local msgpack = require"MessagePack"
 local cjson = require"cjson"
 local md5 = require"md5"
 local httpclient = require"httpclient".new()
-local url = require"socket.url"
+--local url = require"socket.url"
+local url_ok,url = pcall(_G.require, "socket.url")
+if url_ok ~= true then url_ok, url = pcall(_G.require, "url")end
 local MessageModel = require"messageModel"
 local SessionModel = require"sessionModel"
 local eventCodes = require'eventCodes'
@@ -35,11 +37,11 @@ end
 --
 --device 设备名称
 --protocol 默认协议：'RiverrunBinary'
---timeout 默认不超时
 --json 默认使用msgpack
 --return void
-function init(device, path, wsProtocol)
+function init(device, path, wsProtocol, timeout)
   _g = {}
+  _g.socket = {}
   _g.ws = {}
   _g.api = {}
   _g.user = {}
@@ -47,19 +49,22 @@ function init(device, path, wsProtocol)
   _g.appkey = appkey
   _g.device = device or ''
   _g.json = 'msgpack'
-  _g.ws.protocol = wsProtocol or 'riverrun.binary.msgpack'
+  _g.debug = debug or false
   --Sqlite
   _g.sqlite = {['path']=path}
   _g.messageModel = MessageModel.new(_g.sqlite)
   _g.sessionModel = SessionModel.new(_g.sqlite)
   _g.messageModel:init()
   _g.sessionModel:init()
-  --WS参数
+  --Socket
+  _g.socket.timeout = 0.05
+  --WebSocket参数
+  _g.ws.protocol = wsProtocol or 'riverrun.binary.msgpack'
   _g.ws.host = 'ws.me2.tv'
   _g.ws.host = '192.168.1.16'
   _g.ws.port = '7272'
   _g.ws.scheme = 'ws'
-  _g.ws.timeout = nil
+  _g.ws.timeout = timeout
   --API参数
   _g.api.host = 'ws.me2.tv'
   _g.api.host = '192.168.1.16'
@@ -68,6 +73,11 @@ function init(device, path, wsProtocol)
   _g.api.key = key or 'woRKeRmAn'
   --设置csjon
   cjson.encode_sparse_array(true)
+end
+
+--开启调试
+function debug()
+  _g.socket.timeout = nil
 end
 
 --连接服务器
@@ -283,7 +293,8 @@ end
 
 function receive()
   if _g.client ~= nil and _g.client.state == 'OPEN' then
-    local recvt,sendt,status = socket.select({_g.client.sock},nil,0.05)
+    local timeout = 0.05
+    local recvt,sendt,status = socket.select({_g.client.sock},nil,_g.socket.timeout)
     if #recvt > 0 then
       receive_sync()
     end

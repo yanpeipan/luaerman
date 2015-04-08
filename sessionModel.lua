@@ -24,7 +24,7 @@ function sessionModel:init()
   `target` INTEGER NOT NULL,
   `target_type` INTEGER NOT NULL,
   `target_name` TEXT NOT NULL,
-  `time` TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `time` INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
   CREATE UNIQUE INDEX `unique_session` ON `session` (`uid` ,`target` ,`target_type`)
   ]=]
@@ -75,7 +75,7 @@ function sessionModel:delete(uid, target, target_type)
 end
 
 function sessionModel:get(uid, sender, receiver, receiver_type)
-  local sql = 'SELECT * FROM session WHERE '
+  local sql = 'SELECT target as id, target_type as type, target_name as name FROM session WHERE '
   local getNamedValues = {}
   local values = {
     uid = uid,
