@@ -8,9 +8,7 @@ local msgpack = require"MessagePack"
 local cjson = require"cjson"
 local md5 = require"md5"
 local httpclient = require"httpclient".new()
---local url = require"socket.url"
-local url_ok,url = pcall(_G.require, "socket.url")
-if url_ok ~= true then url_ok, url = pcall(_G.require, "url")end
+local url = require"socket.url"
 local MessageModel = require"messageModel"
 local SessionModel = require"sessionModel"
 local eventCodes = require'eventCodes'
@@ -208,7 +206,7 @@ function sendText(target, targetType, text)
       sender = sender,
       msg = text
     }
-    local id, errmsg = _g.sessionModel:add(sender, target, targetType)
+    local id, errmsg = _g.sessionModel:add(sender, target, targetType, target)
     message.msgid = id
     send({1004, {['receiver']=receiver, ['receiver_type']=receiverType}, message})
   end

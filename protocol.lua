@@ -62,6 +62,7 @@ local protocol = function()
     [1004] = function(_, target, message)
       --local sender = {['id']=message.sender, ['type']=0}
       local target, targetType = getTarget(target.receiver, target.receiver_type)
+      print('target:', target, targetType)
       local data = {
         ['code'] = codes['CODE_OK'],
         ['message'] = {

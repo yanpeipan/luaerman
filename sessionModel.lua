@@ -78,7 +78,7 @@ function sessionModel:get(uid, sender, receiver, receiver_type)
   local sql = 'SELECT target as id, target_type as type, target_name as name FROM session WHERE '
   local getNamedValues = {}
   local values = {
-    uid = uid,
+    uid = tonumber(uid),
     sender = sender,
     receiver = receiver,
     reciever_type = receiver_type
@@ -91,23 +91,14 @@ function sessionModel:get(uid, sender, receiver, receiver_type)
       table.insert(bindValues, v)
     end
   end
-  sql = sql .. table.concat(conditions, ',')
-  print(sql)
-  print(uid)
+  sql = sql .. table.concat(conditions, ',') .. ' ORDER BY time desc'
   local stmt = self.db:prepare(sql)
   local errcode = self.db:errcode()
   if errcode == 0 then
     stmt:bind_values(unpack(bindValues))
-    local code = stmt:step()
-    print(code)
-    if code == 101 then
-      stmt:reset()
-    else
-      for row in stmt:rows() do
-        local getNamedValu = stmt:get_named_values()
-        print(getNamedValue)
-        table.insert(getNamedValues, getNamedValue)
-      end
+    for row in stmt:nrows() do
+      local getNamedValue = stmt:get_named_values()
+      table.insert(getNamedValues, getNamedValue)
     end
   end
   return getNamedValues or {}, self.db:errmsg()
