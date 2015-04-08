@@ -64,12 +64,15 @@ local protocol = function()
       --local sender = {['id']=message.sender, ['type']=0}
       local target, targetType = getTarget(target.receiver, target.receiver_type)
       local data = {
-        ['receiver']=target,
-        ['receiver_type']=targetType,
-        ['sender']=message.sender,
-        ['sender_type']=0,
-        ['text']=message.msg,
-        ['date']=message.date
+        ['code'] = codes['CODE_OK'],
+        ['message'] = {
+          ['receiver']=target,
+          ['receiver_type']=targetType,
+          ['sender']=message.sender,
+          ['sender_type']=0,
+          ['text']=message.msg,
+          ['date']=message.date
+        }
       }
       if _.currentUser:isCurrentUser(message.sender) then
         onDelegate(eventCodes['GotyeEventCodeSendMessage'], data)

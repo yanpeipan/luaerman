@@ -92,6 +92,8 @@ function sessionModel:get(uid, sender, receiver, receiver_type)
     end
   end
   sql = sql .. table.concat(conditions, ',')
+  print(sql)
+  print(uid)
   local stmt = self.db:prepare(sql)
   local errcode = self.db:errcode()
   if errcode == 0 then
@@ -100,11 +102,12 @@ function sessionModel:get(uid, sender, receiver, receiver_type)
     if code == 101 then
       stmt:reset()
     else
-      getNamedValues = stmt:get_named_values()
+      for row in stmt:rows() do
+        table.insert(getNamedValues, stmt:get_named_values())
+      end
     end
   end
   return getNamedValues or {}, self.db:errmsg()
-
 end
 
 return m
