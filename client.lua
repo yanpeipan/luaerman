@@ -283,7 +283,7 @@ end
 
 function receive()
   if _g.client ~= nil and _g.client.state == 'OPEN' then
-    local recvt,sendt,status = socket.select({_g.client.sock},nil,nil)
+    local recvt,sendt,status = socket.select({_g.client.sock},nil,0.05)
     if #recvt > 0 then
       receive_sync()
     end
