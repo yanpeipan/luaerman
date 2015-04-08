@@ -23,7 +23,7 @@ call('sendText', 103, 2, {'hello'})
 call('receive')
 
 --print(getLastMessage(103, 2)) --返回json数据格式不对
---print(getSessionlist())
+print(getSessionlist())
 --deleteSession()
 --print(getUnreadMsgcount(1, 0))
 --print(getUnreadMsgcountByType(0))

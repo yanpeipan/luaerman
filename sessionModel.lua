@@ -10,7 +10,7 @@ m.new = function(sqlite)
     read = 2,
     unread = 1
   }
-  self.db = lsqlite3.open(sqlite.path)
+  self.db = assert(lsqlite3.open(sqlite.path))
   setmetatable(self, {__index = sessionModel})
   self:init()
   return self

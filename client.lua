@@ -201,7 +201,7 @@ function sendText(target, targetType, text)
     else
       message.msg = text
     end
-    local id, errmsg = _g.sessionModel:add(sender, receiver, receiverType)
+    local id, errmsg = _g.sessionModel:add(sender, target, targetType)
     message.msgid = id
     send({1004, {['receiver']=receiver, ['receiver_type']=receiverType}, message})
     --if receiver_type == 2 then
@@ -283,7 +283,7 @@ end
 
 function receive()
   if _g.client ~= nil and _g.client.state == 'OPEN' then
-    local recvt,sendt,status = socket.select({_g.client.sock},nil,0.01)
+    local recvt,sendt,status = socket.select({_g.client.sock},nil,nil)
     if #recvt > 0 then
       receive_sync()
     end
@@ -406,10 +406,11 @@ end
 --
 --
 function getSessionlist()
-  local uid = getUser('uid')
+  local uid = _g.currentUser:get('id')
   local sessionList = {}
+  local errmsg
   if uid ~= nil then
-    sessionList = _g.sessionModel:get(uid)
+    sessionList,errmsg = _g.sessionModel:get(uid)
   end
   return cjson.encode(sessionList)
 end
@@ -418,7 +419,7 @@ end
 --
 --
 function getTargetDetail(target, type, forceRequest)
-  local uid = getUser('uid')
+  local uid = _g.currentUser:get('id')
   local user = ''
   if uid ~= nil then
     local url = getApiUrl('/user/detail/' .. target)
