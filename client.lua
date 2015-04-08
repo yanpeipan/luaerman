@@ -15,6 +15,7 @@ local MessageModel = require"messageModel"
 local SessionModel = require"sessionModel"
 local eventCodes = require'eventCodes'
 local User = require'User'
+local inspect_ok, inspect = pcall(_G.require, 'inspect')
 
 --client全局变量
 local _g
@@ -204,23 +205,12 @@ function sendText(target, targetType, text)
     local sender = _g.currentUser:get('id')
     local receiver, receiverType = getReceiver(target, targetType)
     local message = {
-      sender = sender
+      sender = sender,
+      msg = text
     }
-    if type(text) == 'table' then
-      message.msg = msgpack.pack(text)
-    else
-      message.msg = text
-    end
     local id, errmsg = _g.sessionModel:add(sender, target, targetType)
     message.msgid = id
     send({1004, {['receiver']=receiver, ['receiver_type']=receiverType}, message})
-    --if receiver_type == 2 then
-    --  send({1004, receiver, messsage})
-    --elseif receiver_type == 0 then
-    --  send({1004, {['receiver']=receiver, ['receiver_type']=2}, message})
-    --end
-    --onSendMessage(0, message)
-    --
   end
 end
 
@@ -287,6 +277,7 @@ function receive_sync()
         message = assert(msgpack.unpack(message))
       end
     end
+    pcall(_G.inspect, message, {depth=4})
     onMessage(message)
   end
 end

@@ -14,7 +14,6 @@ function onDelegate(event, table)
   else
     data = cjson.encode({})
   end
-
   --debug
   local eventName
   for k,v in pairs(eventCodes) do

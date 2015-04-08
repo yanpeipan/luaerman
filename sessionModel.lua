@@ -99,11 +99,14 @@ function sessionModel:get(uid, sender, receiver, receiver_type)
   if errcode == 0 then
     stmt:bind_values(unpack(bindValues))
     local code = stmt:step()
+    print(code)
     if code == 101 then
       stmt:reset()
     else
       for row in stmt:rows() do
-        table.insert(getNamedValues, stmt:get_named_values())
+        local getNamedValu = stmt:get_named_values()
+        print(getNamedValue)
+        table.insert(getNamedValues, getNamedValue)
       end
     end
   end
