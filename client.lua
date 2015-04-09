@@ -130,7 +130,7 @@ end
 --
 function getReceiver(target, targetType)
   local receiver
-  local receiver_type
+  local receiverType
   if targetType ==0 then
     receiver = target
     receiverType = 2
@@ -143,14 +143,14 @@ end
 
 --获取亲加对应的target&targetType
 --
-function getTarget(receiver, receiver_type)
+function getTarget(receiver, receiverType)
   local target
   local targetType
-  if receiver_type == 2 then
+  if receiverType == 2 then
     target = receiver
     targetType = 0
   else
-    target = receiver * 100 + receiver_type
+    target = receiver * 100 + receiverType
     targeType = 2
   end
   return target, targeType
