@@ -202,13 +202,14 @@ function sendText(target, targetType, text)
   if _g.currentUser.isLogin then
     local sender = _g.currentUser:get('id')
     local receiver, receiverType = getReceiver(target, targetType)
-    print(receiver, receiverType)
+    print('sendText:', receiver, receiverType)
     local message = {
       sender = sender,
       msg = text
     }
     local id, errmsg = _g.sessionModel:add(sender, target, targetType, target)
     message.msgid = id
+    print('sendText:', receiver, receiverType)
     send({1004, {['receiver']=receiver, ['receiver_type']=receiverType}, message})
   end
 end
