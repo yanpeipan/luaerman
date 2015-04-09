@@ -129,8 +129,8 @@ end
 --获取服务器对应的receiver&receiver_type
 --
 function getReceiver(target, targetType)
-  targetType = math.floor(targetType)
-  target = math.floor(target)
+  targetType = math.floor(tonumber(targetType))
+  target = math.floor(tonumber(target))
   local receiver
   local receiverType
   if targetType == 0 then
