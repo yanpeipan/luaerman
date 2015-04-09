@@ -27,8 +27,11 @@ call('receive')
 --call('receive')
 
 --call('sendText', 103, 2, message)
---call('sendText', 233555, 0, {'hello'})
-call('sendText', 261690, 0, {'hello'})
+--call('sendText', 233555, '0', {'hello'})
+--call('sendText', 261690, '0', {'hello'})
+call('receive')
+call('receive')
+call('receive')
 call('receive')
 
 --print(getLastMessage(103, 2)) --返回json数据格式不对

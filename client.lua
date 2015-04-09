@@ -129,9 +129,11 @@ end
 --获取服务器对应的receiver&receiver_type
 --
 function getReceiver(target, targetType)
+  targetType = math.floor(targetType)
+  target = math.floor(target)
   local receiver
   local receiverType
-  if targetType ==0 then
+  if targetType == 0 then
     receiver = target
     receiverType = 2
   else
@@ -144,6 +146,8 @@ end
 --获取亲加对应的target&targetType
 --
 function getTarget(receiver, receiverType)
+  receiver = math.floor(receiver)
+  receiverType = math.floor(receiverType)
   local target
   local targetType
   if receiverType == 2 then
@@ -202,14 +206,12 @@ function sendText(target, targetType, text)
   if _g.currentUser.isLogin then
     local sender = _g.currentUser:get('id')
     local receiver, receiverType = getReceiver(target, targetType)
-    print('sendText:', receiver, receiverType)
     local message = {
       sender = sender,
       msg = text
     }
     local id, errmsg = _g.sessionModel:add(sender, target, targetType, target)
     message.msgid = id
-    print('sendText:', receiver, receiverType)
     send({1004, {['receiver']=receiver, ['receiver_type']=receiverType}, message})
   end
 end
