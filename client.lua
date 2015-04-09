@@ -440,18 +440,18 @@ end
 --
 function isOnline()
   local status
-  if _g.client ~= nil and _g.client.state == 'OPEN' then
+  if _g.client ~= nil and _g.client.state ~= 'OPEN' then
     status = -1
-    elseif _g.currentUser.isLogin then
-      status = 1
-    else
-      status = 0
-    end
-    return status
+  elseif _g.currentUser.isLogin then
+    status = 1
+  else
+    status = 0
   end
+  return status
+end
 
-  --激活对应的会话session（这样收到的对应该Target的消息自动标记为已读）
-  --
-  --
-  function activeSession(target, type)
-  end
+--激活对应的会话session（这样收到的对应该Target的消息自动标记为已读）
+--
+--
+function activeSession(target, type)
+end
