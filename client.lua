@@ -44,7 +44,7 @@ function init(device, path, wsProtocol, timeout)
   _g.ws = {}
   _g.api = {}
   _g.user = {}
-  _g.currentUser = User.new()
+  _g.currentUser = _g.currentUser or User.new()
   _g.appkey = appkey
   _g.device = device or ''
   _g.json = 'msgpack'
