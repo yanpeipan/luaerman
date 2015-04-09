@@ -61,6 +61,7 @@ local protocol = function()
     end,
     [1004] = function(_, target, message)
       --local sender = {['id']=message.sender, ['type']=0}
+      print(target.receiver, target.receiver_type)
       local target, targetType = getTarget(target.receiver, target.receiver_type)
       print('target:', target, targetType)
       local data = {

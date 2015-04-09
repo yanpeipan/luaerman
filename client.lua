@@ -153,7 +153,7 @@ function getTarget(receiver, receiverType)
     target = receiver * 100 + receiverType
     targeType = 2
   end
-  return target, targeType
+  return target, targetType
 end
 
 --用户登录
