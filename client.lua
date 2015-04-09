@@ -146,6 +146,8 @@ end
 --获取亲加对应的target&targetType
 --
 function getTarget(receiver, receiverType)
+  receiver = tonumber(receiver) or 0
+  receiverType = tonumber(receiverType) or 0
   receiver = math.floor(receiver)
   receiverType = math.floor(receiverType)
   local target
@@ -155,7 +157,7 @@ function getTarget(receiver, receiverType)
     targetType = 0
   else
     target = receiver * 100 + receiverType
-    targeType = 2
+    targetType = 2
   end
   return target, targetType
 end
@@ -382,18 +384,31 @@ end
 --
 --
 function getLastMessage(target, targetType)
+  local lastMessage = ''
   if _g.currentUser.isLogin then
     local uid = _g.currentUser:get('id')
     local receiver, receiverType = getReceiver(target, targetType)
-    local params = {['sender']=uid, ['receiver']=receiver, ['receiver_type']=receiverType, ['size']=1} local url = getApiUrl('/message/' , params)
+    local params = {['sender']=uid, ['receiver']=receiver, ['receiver_type']=receiverType, ['size']=1} 
+    local url = getApiUrl('/message/' , params)
     local result = httpclient:get(url)
+    local message
     if result ~= nil and result.code == 200 then
       local json = cjson.decode(result.body)
       if json ~= nil and json.messages ~= nil then
-        return cjson.encode(json.messages[1])
+        message=json.messages[1]
+        local receiver, receiverType = getTarget(message.receiver, message.receiver_type)
+        lastMessage = cjson.encode({
+          ['receiver']=receiver,
+          ['receiver_type']=receiverType,
+          ['sender']=message.sender,
+          ['sender_type']=0,
+          ['text']=message.message,
+          ['date']=message.time
+        })
       end
     end
   end
+  return lastMessage
 end
 
 --删除会话

@@ -34,8 +34,8 @@ print('is online:', isOnline())
 --call('receive')
 --call('receive')
 
---print(getLastMessage(103, 2)) --返回json数据格式不对
-print(getSessionlist())
+--print('lastMessage:', getLastMessage(103, 2)) --返回json数据格式不对
+print('sessionList', getSessionlist())
 --deleteSession()
 --print(getUnreadMsgcount(1, 0))
 --print(getUnreadMsgcountByType(0))
