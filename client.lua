@@ -131,14 +131,14 @@ end
 function getReceiver(target, targetType)
   local receiver
   local receiver_type
-  if target_type ==0 then
+  if targetType ==0 then
     receiver = target
     receiverType = 2
   else
     receiver = math.floor(target / 100)
-    receiver_type = target % 100
+    receiverType = target % 100
   end
-  return receiver, receiver_type
+  return receiver, receiverType
 end
 
 --获取亲加对应的target&targetType
@@ -202,6 +202,7 @@ function sendText(target, targetType, text)
   if _g.currentUser.isLogin then
     local sender = _g.currentUser:get('id')
     local receiver, receiverType = getReceiver(target, targetType)
+    print(receiver, receiverType)
     local message = {
       sender = sender,
       msg = text

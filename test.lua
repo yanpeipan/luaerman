@@ -20,14 +20,15 @@ call('receive')
 --local _g = getter()
 --print(_g.currentUser.isLogin)
 
-call('joinGroup', 103)
-call('receive')
+--call('joinGroup', 103)
+--call('receive')
 
 --call('requestGroupMemberlist', 103)
 --call('receive')
 
-call('sendText', 103, 2, message)
-call('sendText', 233555, 0, {'hello'})
+--call('sendText', 103, 2, message)
+--call('sendText', 233555, 0, {'hello'})
+call('sendText', 261690, 0, {'hello'})
 call('receive')
 
 --print(getLastMessage(103, 2)) --返回json数据格式不对
