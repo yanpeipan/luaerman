@@ -416,7 +416,7 @@ end
 --
 --
 function getLocalMessage(target, targetType, page, size)
-  local lastMessage = ''
+  local messages = {}
   size = size or 20
   page = page or 1
   if _g.currentUser.isLogin then
@@ -428,22 +428,25 @@ function getLocalMessage(target, targetType, page, size)
     local message
     if result ~= nil and result.code == 200 then
       local json = cjson.decode(result.body)
-      if json ~= nil and json.messages ~= nil then
-        message=json.messages[1]
-        local receiver, receiverType = getTarget(message.receiver, message.receiver_type)
-        lastMessage = cjson.encode({
-          ['receiver']=receiver,
-          ['receiver_type']=receiverType,
-          ['sender']=message.sender,
-          ['sender_type']=0,
-          ['text']=message.message,
-          ['date']=message.time,
-          ['status']=message.chatstatus
-        })
+      if json ~= nil and #json.messages > 0 then
+        for _,message in ipairs(json.messages) do
+          message=json.messages[1]
+          local receiver, receiverType = getTarget(message.receiver, message.receiver_type)
+          local message = cjson.encode({
+            ['receiver']=receiver,
+            ['receiver_type']=receiverType,
+            ['sender']=message.sender,
+            ['sender_type']=0,
+            ['text']=message.message,
+            ['date']=message.time,
+            ['status']=message.chatstatus
+          })
+          table.insert(messages, message)
+        end
       end
     end
   end
-  return lastMessage
+  return cjson.encode(messages)
 end
 
 
