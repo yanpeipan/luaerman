@@ -403,7 +403,8 @@ function getLastMessage(target, targetType)
           ['sender']=message.sender,
           ['sender_type']=0,
           ['text']=message.message,
-          ['date']=message.time
+          ['date']=message.time,
+          ['status']=message.chatstatus
         })
       end
     end
@@ -416,6 +417,8 @@ end
 --
 function getLocalMessage(target, targetType, page, size)
   local lastMessage = ''
+  size = size or 20
+  page = page or 1
   if _g.currentUser.isLogin then
     local uid = _g.currentUser:get('id')
     local receiver, receiverType = getReceiver(target, targetType)
@@ -434,7 +437,8 @@ function getLocalMessage(target, targetType, page, size)
           ['sender']=message.sender,
           ['sender_type']=0,
           ['text']=message.message,
-          ['date']=message.time
+          ['date']=message.time,
+          ['status']=message.chatstatus
         })
       end
     end
