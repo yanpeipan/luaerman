@@ -414,12 +414,12 @@ end
 --获取对应Target的最后一条消息
 --
 --
-function getLocalMessage(target, targetType)
+function getLocalMessage(target, targetType, page, size)
   local lastMessage = ''
   if _g.currentUser.isLogin then
     local uid = _g.currentUser:get('id')
     local receiver, receiverType = getReceiver(target, targetType)
-    local params = {['sender']=uid, ['receiver']=receiver, ['receiver_type']=receiverType, ['size']=50}
+    local params = {['sender']=uid, ['receiver']=receiver, ['receiver_type']=receiverType, ['size']=size, ['page']=page}
     local url = getApiUrl('/message/' , params)
     local result = httpclient:get(url)
     local message
