@@ -388,7 +388,7 @@ function getLastMessage(target, targetType)
   if _g.currentUser.isLogin then
     local uid = _g.currentUser:get('id')
     local receiver, receiverType = getReceiver(target, targetType)
-    local params = {['sender']=uid, ['receiver']=receiver, ['receiver_type']=receiverType, ['size']=1} 
+    local params = {['sender']=uid, ['receiver']=receiver, ['receiver_type']=receiverType, ['size']=1}
     local url = getApiUrl('/message/' , params)
     local result = httpclient:get(url)
     local message
@@ -401,10 +401,11 @@ function getLastMessage(target, targetType)
           ['receiver']=receiver,
           ['receiver_type']=receiverType,
           ['sender']=message.sender,
-          ['sender_type']=0,
+          ['sender_type']=message.sender_type or 0,
           ['text']=message.message,
           ['date']=message.time,
-          ['status']=message.chatstatus
+          ['status']=message.chatstatus,
+          ['type']=message.type or 0
         })
       end
     end
