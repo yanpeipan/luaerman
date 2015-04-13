@@ -59,17 +59,15 @@ function init(device, path, wsProtocol, timeout)
   _g.socket.timeout = 0.05
   --WebSocket参数
   _g.ws.protocol = wsProtocol or 'riverrun.binary.msgpack'
-  _g.ws.host = 'ws.me2.tv'
   _g.ws.host = '192.168.1.16'
   _g.ws.port = '7272'
   _g.ws.scheme = 'ws'
   _g.ws.timeout = timeout
   --API参数
-  _g.api.host = 'ws.me2.tv'
   _g.api.host = '192.168.1.16'
   _g.api.port = '55252'
   _g.api.scheme = 'http'
-  _g.api.key = key or 'woRKeRmAn'
+  _g.api.key = key or ''
   --设置csjon
   cjson.encode_sparse_array(true)
 end
