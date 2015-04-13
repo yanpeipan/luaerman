@@ -12,9 +12,7 @@ init('android', '/Users/yan/IMDB', nil, nil)
 debug()
 print('connect server:', connectServer())
 
---call('login', '18600218174', '19891015')
---call('receive')
-call('login', '15063343355', '295079529')
+call('login', 'test', 'test')
 call('receive')
 print('is online:', isOnline())
 
