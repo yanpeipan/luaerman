@@ -1,10 +1,6 @@
-安装本地开发环境：LUA-5.1.5
+# 安装环境:
 
 ```
-brew tap homebrew/boneyard
-cd $( brew --prefix )
-git checkout 6b08bff /usr/local/Library/Formula/lua.rb
-git checkout 1fed492 /usr/local/Library/Formula/luarocks.rb
 brew install lua
 brew install luarocks
 brew install sqlite3
