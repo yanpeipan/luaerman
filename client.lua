@@ -424,13 +424,13 @@ function getLocalMessage(target, targetType, page, size)
     local receiver, receiverType = getReceiver(target, targetType)
     local params = {['sender']=uid, ['receiver']=receiver, ['receiver_type']=receiverType, ['size']=size, ['page']=page}
     local url = getApiUrl('/message/' , params)
+    print(url)
     local result = httpclient:get(url)
     local message
     if result ~= nil and result.code == 200 then
       local json = cjson.decode(result.body)
       if json ~= nil and #json.messages > 0 then
         for _,message in ipairs(json.messages) do
-          message=json.messages[1]
           local receiver, receiverType = getTarget(message.receiver, message.receiver_type)
           local message = {
             ['receiver']=receiver,
