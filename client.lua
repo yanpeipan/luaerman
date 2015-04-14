@@ -67,9 +67,10 @@ function init(device, path, wsProtocol, timeout)
   _g.api.host = '192.168.1.16'
   _g.api.port = '55252'
   _g.api.scheme = 'http'
-  _g.api.key = key or ''
+  _g.api.key = key or 'woRKeRmAn'
   --设置csjon
   cjson.encode_sparse_array(true)
+  return _g
 end
 
 --开启调试
@@ -431,7 +432,7 @@ function getLocalMessage(target, targetType, page, size)
         for _,message in ipairs(json.messages) do
           message=json.messages[1]
           local receiver, receiverType = getTarget(message.receiver, message.receiver_type)
-          local message = cjson.encode({
+          local message = {
             ['receiver']=receiver,
             ['receiver_type']=receiverType,
             ['sender']=message.sender,
@@ -439,7 +440,7 @@ function getLocalMessage(target, targetType, page, size)
             ['text']=message.message,
             ['date']=message.time,
             ['status']=message.chatstatus
-          })
+          }
           table.insert(messages, message)
         end
       end
