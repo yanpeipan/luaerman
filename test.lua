@@ -38,7 +38,7 @@ print('is online:', isOnline())
 
 --print('lastMessage:', getLastMessage(103, 2)) --返回json数据格式不对
 print('sessionList', getSessionlist())
-print('getLocalMessage', print(inspect(cjson.decode(getLocalMessage(244465, 0)))))
+--print('getLocalMessage', print(inspect(cjson.decode(getLocalMessage(244465, 0)))))
 --deleteSession()
 --print(getUnreadMsgcount(1, 0))
 --print(getUnreadMsgcountByType(0))

@@ -166,7 +166,6 @@ end
 --
 function login(usr, psw)
   send({1007, usr, psw})
-  return true
 end
 
 --用户注销
