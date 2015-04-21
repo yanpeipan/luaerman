@@ -70,6 +70,9 @@ function init(device, path, wsProtocol, timeout)
   _g.api.key = key or 'woRKeRmAn'
   --设置csjon
   cjson.encode_sparse_array(true)
+  --初始化websocket
+  local options = {timeout=_g.ws.timeout}
+  _g.client = websocket.client:new(options)
   return _g
 end
 
@@ -82,8 +85,6 @@ end
 --
 --
 function connectServer()
-  local options = {timeout=_g.ws.timeout}
-  _g.client = websocket.client:new(options)
   local wsProtocol = _g.ws.protocol
   local wsUrl = getWSUrl()
   local code, err = _g.client:connect(wsUrl, wsProtocol);
@@ -128,8 +129,8 @@ end
 --获取服务器对应的receiver&receiver_type
 --
 function getReceiver(target, targetType)
-  targetType = math.floor(tonumber(targetType))
-  target = math.floor(tonumber(target))
+  targetType = targetType
+  target = target
   local receiver
   local receiverType
   if targetType == 0 then
