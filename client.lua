@@ -71,8 +71,6 @@ function init(device, path, wsProtocol, timeout)
   --设置csjon
   cjson.encode_sparse_array(true)
   --初始化websocket
-  local options = {timeout=_g.ws.timeout}
-  _g.client = websocket.client:new(options)
   return _g
 end
 
@@ -85,10 +83,19 @@ end
 --
 --
 function connectServer()
+  local options = {timeout=_g.ws.timeout}
+  _g.client = _g.client or websocket.client:new(options)
   local wsProtocol = _g.ws.protocol
   local wsUrl = getWSUrl()
   local code, err = _g.client:connect(wsUrl, wsProtocol);
   return code
+end
+
+--关闭链接
+--
+--
+function disconnect()
+  _g.client:close()
 end
 
 --获取WS服务URI
@@ -131,6 +138,8 @@ end
 function getReceiver(target, targetType)
   targetType = targetType
   target = target
+  print(target)
+  print(targetType)
   local receiver
   local receiverType
   if targetType == 0 then
@@ -180,10 +189,11 @@ end
 --
 --@example joinGroup(1001) or joinGroup(10, 1)
 function joinGroup(...)
-  if #arg == 1 then
-    send({1001, arg[1]})
-  elseif #arg ==2 then
-    send({1001, {receiver=arg[1], receiver_type=arg[2]}})
+  local group, group_type = select(1, ...)
+  if group_type == nil then
+    send({1001, group})
+  else
+    send({1001, {receiver=group, receiver_type=group_type}})
   end
 end
 
@@ -258,8 +268,10 @@ end
 --
 --
 function call(cName,...)
+  print('call ', cName, select(1, ...))
   if type(_G[cName]) == "function" then
-    _G[cName](unpack(arg))
+    --_G[cName](unpack(select(1, ...)))
+    _G[cName](select(1, ...))
   else
     error('Err: ' .. cName .. ' not found!')
   end
@@ -424,7 +436,6 @@ function getLocalMessage(target, targetType, page, size)
     local receiver, receiverType = getReceiver(target, targetType)
     local params = {['sender']=uid, ['receiver']=receiver, ['receiver_type']=receiverType, ['size']=size, ['page']=page}
     local url = getApiUrl('/message/' , params)
-    print(url)
     local result = httpclient:get(url)
     local message
     if result ~= nil and result.code == 200 then
