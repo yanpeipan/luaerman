@@ -37,6 +37,9 @@ function sessionModel:add(uid, target, target_type, target_name)
   local errcode = self.db:errcode()
   local lastInsertId = 0
   target_name = target_name or ''
+  if type(target_name) == 'number' then
+    target_name = tostring(target_name)
+  end
   if errcode == 0 then
     stmt:bind_values(nil, uid, target, target_type, target_name)
     local code = stmt:step()
