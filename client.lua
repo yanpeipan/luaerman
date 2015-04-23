@@ -84,7 +84,7 @@ end
 --
 function connectServer()
   local options = {timeout=_g.ws.timeout}
-  if _g.client.state ~= 'OPEN' then 
+  if _g.client == nil or _g.client.state ~= 'OPEN' then 
     _g.client = websocket.client:new(options)
   end
   local wsProtocol = _g.ws.protocol
