@@ -84,8 +84,9 @@ end
 --
 function connectServer()
   local options = {timeout=_g.ws.timeout}
-  local test = _g.client or 'sdfsfsfd'
-  _g.client = _g.client or websocket.client:new(options)
+  if _g.client.state ~= 'OPEN' then 
+    _g.client = websocket.client:new(options)
+  end
   local wsProtocol = _g.ws.protocol
   local wsUrl = getWSUrl()
   local code, err = _g.client:connect(wsUrl, wsProtocol);
@@ -97,7 +98,6 @@ end
 --
 function disconnect()
   _g.client:close()
-  _g.client = nil
 end
 
 --获取WS服务URI
