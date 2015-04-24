@@ -13,6 +13,7 @@ local _g = init('android', '/Users/yanpeipan/IMDB', nil, nil)
 debug()
 print('connect server:', connectServer())
 print('disconnect:', disconnect())
+receive()
 print('connect server:', connectServer())
 
 --call('login', '15063343355', '295079529')
