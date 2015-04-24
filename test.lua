@@ -15,6 +15,7 @@ print('connect server:', connectServer())
 print('disconnect:', disconnect())
 receive()
 print('connect server:', connectServer())
+print(_g.client.state)
 
 --call('login', '15063343355', '295079529')
 --call('login', '18600218174', '19891015')
