@@ -128,7 +128,6 @@ function getApiUrl(path, params)
   for k,v in pairs(params) do
     query = query .. k .. '=' .. v .. '&'
   end
-  print('query:', query)
   local apiUrl = url.build({
     host = _g.api.host,
     scheme = _g.api.scheme,
@@ -144,8 +143,6 @@ end
 function getReceiver(target, targetType)
   targetType = targetType
   target = target
-  print(target)
-  print(targetType)
   local receiver
   local receiverType
   if targetType == 0 then
@@ -357,8 +354,9 @@ function getUnreadMsgcountByType(targetType)
     local url = getApiUrl('/message/list/' .. uid, params)
     print('getUnreadMsgcountByType url:', url)
     local result = httpclient:get(url)
-    if result ~= nil then
-      count = result.total or 0
+    if result.code == 200 then
+      local json = cjson.decode(result.body)
+      count = json.total or 0
     end
   end
   return count
@@ -376,8 +374,9 @@ function getUnreadMsgcount(target, targetType)
     local url = getApiUrl('/message/list/' .. uid, params)
     print('get unread message count:', url)
     local result = httpclient:get(url)
-    if result ~= nil then
-      count = result.total or 0
+    if result.code== 200 then
+      local json  = cjson.decode(result.body)
+      count = json.total or 0
     end
   end
   return count
@@ -513,7 +512,6 @@ end
 --
 function isOnline()
   local status
-  print(_g.client.state)
   if _g.client ~= nil and _g.client.state ~= 'OPEN' then
     status = -1
     elseif _g.currentUser.isLogin then

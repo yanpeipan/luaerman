@@ -65,7 +65,7 @@ function sessionModel:delete(uid, target, target_type)
       table.insert(bindValues, v)
     end
   end
-  sql = sql .. table.concat(conditions, ',')
+  sql = sql .. table.concat(conditions, ' and ')
   local stmt = self.db:prepare(sql)
   local errcode = self.db:errcode()
   if errcode == 0 then
