@@ -390,6 +390,7 @@ function markMessagesAsread(target, targetType, status)
     local uid = _g.currentUser:get('id')
     local resultTable = {}
     local apiUrl = getApiUrl('/message/' .. target)
+    print(apiUrl)
     local data = ''
     local result = httpclient:put(apiUrl, data)
     if result ~= nil and result.code == 200 then
