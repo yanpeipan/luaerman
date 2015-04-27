@@ -88,7 +88,7 @@ local protocol = function()
       onDelegate(eventCodes['GotyeEventCodeGetGroupUserList'], {['target']=target, ['members']=members})
     end,
     [1007] = function(_, code, user)
-      if code == 0 then
+      if code == 0 and _.currentUser.isLogin ~= true then
         _.currentUser = User.new(user, true)
       end
       onDelegate(eventCodes['GotyeEventCodeLogin'], {['code']=code, ['user']=user})
