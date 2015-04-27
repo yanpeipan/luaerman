@@ -24,8 +24,4 @@ function User:isCurrentUser(uid)
   return false
 end
 
-function User:isLogin()
-  return self.isLogin
-end
-
 return m

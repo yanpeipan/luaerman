@@ -17,11 +17,11 @@ receive()
 print('connect server:', connectServer())
 print(_g.client.state)
 
---call('login', '15063343355', '295079529')
+call('login', '15063343355', '295079529')
 --call('login', '18600218174', '19891015')
 --login('15063343355', '295079529')
 --login('7eebb715b083b51a93465730c928b97d')
---call('receive')
+call('receive')
 print('is online:', isOnline())
 
 --local _g = getter()
@@ -48,7 +48,7 @@ print('is online:', isOnline())
 --print('getLocalMessage', print((getLocalMessage(261690, 0, 3, 10))))
 --getLocalMessage(288335, 0, 3, 10)
 --deleteSession()
---print(getUnreadMsgcount(1, 0))
+print('unread message count:', getUnreadMsgcount(1, 0))
 --print(getUnreadMsgcountByType(0))
 --print(markSingleMessages()) --服务器未实现
 --print(markMessagesAsread(233555)) --服务器未实现
