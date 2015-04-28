@@ -355,7 +355,7 @@ function getUnreadMsgcountByType(targetType)
   if uid ~= nil then
     local params = {['chatstatus'] = _g.messageModel.status.unread, ['receiver_type'] = receiverType}
     local url = getApiUrl('/message/list/' .. uid, params)
-    print('getUnreadMsgcountByType url:', url)
+    print('getUnreadMsgcountByType url:' .. url)
     local result = httpclient:get(url)
     if result.code == 200 then
       local json = cjson.decode(result.body)
