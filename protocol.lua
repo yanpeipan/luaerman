@@ -60,7 +60,7 @@ local protocol = function()
       _.client:send(message)
     end,
     [1004] = function(_, target, message)
-      --local sender = {['id']=message.sender, ['type']=0}
+      local sender = message.sender
       local target, targetType = getTarget(target.receiver, target.receiver_type)
       local data = {
         ['code'] = codes['CODE_OK'],
