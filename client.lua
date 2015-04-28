@@ -389,12 +389,13 @@ function markMessagesAsread(target, targetType, status)
   if _g.currentUser.isLogin then
     local uid = _g.currentUser:get('id')
     local resultTable = {}
-    local apiUrl = getApiUrl('/message/' .. target)
-    print(apiUrl)
-    local data = ''
-    local result = httpclient:put(apiUrl, data)
+    local target, targetType = getReceiver(target, targetType)
+    local params = {['uid']=uid, ['target']=target, ['target_type']=targetType, ['chatstatus']=2}
+    local apiUrl = getApiUrl('/message/', params)
+    local result = httpclient:put(apiUrl, '')
     if result ~= nil and result.code == 200 then
       resultTable = cjson.decode(result.body) or {}
+      print(resultTable.status)
     end
   end
 end
