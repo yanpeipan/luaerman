@@ -142,12 +142,15 @@ end
 --
 function getReceiver(target, targetType)
   targetType = targetType
-  target = target
+  target = target or 0
   local receiver
   local receiverType
   if targetType == 0 then
     receiver = target
     receiverType = 2
+  elseif target == 0 then
+    receiver = math.floor(target / 100)
+    receiverType = 5
   else
     receiver = math.floor(target / 100)
     receiverType = target % 100
@@ -370,7 +373,7 @@ function getUnreadMsgcount(target, targetType)
   if _g.currentUser.isLogin then
     local uid = _g.currentUser:get('id')
     local receiver, receiverType = getReceiver(target, targetType)
-    local params = {['sender'] = receiver, ['receiver_type']=receiverType, ['receiver']=uid, ['chatstatus'] = _g.messageModel.status.unread}
+    local params = {['sender'] = receiver, ['receiver_type']=receiverType, ['chatstatus'] = _g.messageModel.status.unread}
     local url = getApiUrl('/message/list/' .. uid, params)
     --print('get unread message count:', url)
     local result = httpclient:get(url)
