@@ -370,9 +370,9 @@ function getUnreadMsgcount(target, targetType)
   if _g.currentUser.isLogin then
     local uid = _g.currentUser:get('id')
     local receiver, receiverType = getReceiver(target, targetType)
-    local params = {['sender'] = receiver, ['receiver_type']=receiverType, ['chatstatus'] = _g.messageModel.status.unread}
+    local params = {['sender'] = receiver, ['receiver_type']=receiverType, ['receiver']=uid, ['chatstatus'] = _g.messageModel.status.unread}
     local url = getApiUrl('/message/list/' .. uid, params)
-    print('get unread message count:', url)
+    --print('get unread message count:', url)
     local result = httpclient:get(url)
     if result.code== 200 then
       local json  = cjson.decode(result.body)

@@ -49,7 +49,7 @@ print('is online:', isOnline())
 --print('getLocalMessage', print((getLocalMessage(261690, 0, 3, 10))))
 --getLocalMessage(288335, 0, 3, 10)
 --print('delete session', deleteSession(233555, 0))
---print('unread message count:', getUnreadMsgcount(233555, 0))
+print('unread message count:', getUnreadMsgcount(233555, 0))
 print('mark message as read:', markMessagesAsread(233555, 0))
 --print(getUnreadMsgcountByType(0))
 --print(markSingleMessages()) --服务器未实现
